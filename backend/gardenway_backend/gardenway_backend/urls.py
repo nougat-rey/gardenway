@@ -22,3 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('__debug__/', include(debug_toolbar.urls))
 ]
+
+admin.site.site_header = "Gardenway Admin"
+admin.site.index_title = "Admin"
