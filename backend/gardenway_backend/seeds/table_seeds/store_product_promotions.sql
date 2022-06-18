@@ -1,0 +1,10 @@
+insert into store_product_promotions (product_id, promotion_id) values (5, 43);
+insert into store_product_promotions (product_id, promotion_id) values (32, 42);
+insert into store_product_promotions (product_id, promotion_id) values (29, 48);
+insert into store_product_promotions (product_id, promotion_id) values (42, 32);
+insert into store_product_promotions (product_id, promotion_id) values (41, 39);
+insert into store_product_promotions (product_id, promotion_id) values (22, 42);
+insert into store_product_promotions (product_id, promotion_id) values (19, 7);
+insert into store_product_promotions (product_id, promotion_id) values (1, 29);
+insert into store_product_promotions (product_id, promotion_id) values (32, 3);
+insert into store_product_promotions (product_id, promotion_id) values (34, 34);

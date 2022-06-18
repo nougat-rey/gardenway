@@ -1,0 +1,10 @@
+insert into store_product_collections (product_id, collection_id) values (36, 16);
+insert into store_product_collections (product_id, collection_id) values (29, 16);
+insert into store_product_collections (product_id, collection_id) values (47, 1);
+insert into store_product_collections (product_id, collection_id) values (34, 11);
+insert into store_product_collections (product_id, collection_id) values (3, 31);
+insert into store_product_collections (product_id, collection_id) values (21, 40);
+insert into store_product_collections (product_id, collection_id) values (46, 14);
+insert into store_product_collections (product_id, collection_id) values (19, 2);
+insert into store_product_collections (product_id, collection_id) values (34, 42);
+insert into store_product_collections (product_id, collection_id) values (47, 22);
