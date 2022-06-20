@@ -33,7 +33,8 @@ class Product(models.Model):
         max_digits=6, decimal_places=2, validators=[MinValueValidator(1)])
     inventory = models.IntegerField(validators=[MinValueValidator(0)])
     last_update = models.DateTimeField(auto_now=True)
-    collections = models.ManyToManyField(Collection, blank=True)
+    collections = models.ManyToManyField(
+        Collection, blank=True, related_name='products')
     promotions = models.ManyToManyField(Promotion, blank=True)
 
     def __str__(self):
