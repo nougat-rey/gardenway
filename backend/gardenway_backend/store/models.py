@@ -7,6 +7,12 @@ class Promotion(models.Model):
     discount = models.FloatField(
         validators=[MinValueValidator(1), MaxLengthValidator(99)])
 
+    def __str__(self):
+        return self.description
+
+    class Meta:
+        ordering = ['discount']
+
 
 class Collection(models.Model):
     title = models.CharField(max_length=255)
@@ -80,6 +86,7 @@ class Address(models.Model):
 
 
 class Cart(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
