@@ -2,12 +2,13 @@ from django.db.models.aggregates import Count
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from .models import Collection, Product, OrderItem
-from .serializers import CollectionSerializer, ProductSerializer
+from .models import Collection, Product, OrderItem, ProductImage
+from .serializers import CollectionSerializer, ProductSerializer, ProductImageSerializer
 
 
 class ProductViewSet(ModelViewSet):
-    queryset = Product.objects.prefetch_related('collections').all()
+    queryset = Product.objects.prefetch_related(
+        'collections').all().order_by('title')
     serializer_class = ProductSerializer
 
     def get_serializer_context(self):
@@ -22,10 +23,20 @@ class ProductViewSet(ModelViewSet):
 
 class CollectionViewSet(ModelViewSet):
     queryset = Collection.objects.prefetch_related(
-        'products').annotate(products_count=Count('products')).all()
+        'products').annotate(products_count=Count('products')).all().order_by('id')
     serializer_class = CollectionSerializer
 
     def destroy(self, request, *args, **kwargs):
         if Product.objects.filter(collection_id=kwargs['pk']).count() > 0:
             return Response({'error': 'Collection cannot be deleted because it includes one or more products.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         return super().destroy(request, *args, **kwargs)
+
+
+class ProductImageViewSet(ModelViewSet):
+    serializer_class = ProductImageSerializer
+
+    def get_serializer_context(self):
+        return {'product_id': self.kwargs['product_pk']}
+
+    def get_queryset(self):
+        return ProductImage.objects.filter(product_id=self.kwargs['product_pk'])
