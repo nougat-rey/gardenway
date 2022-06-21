@@ -8,7 +8,7 @@ from .serializers import CollectionSerializer, ProductSerializer, ProductImageSe
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.prefetch_related(
-        'collections').all().order_by('title')
+        'collections', 'images').order_by('title').all()
     serializer_class = ProductSerializer
 
     def get_serializer_context(self):
