@@ -1,6 +1,7 @@
 from django.contrib import admin, messages
 from django.db.models.aggregates import Count
 from . import models
+from django.utils.html import format_html
 
 
 class InventoryFilter(admin.SimpleListFilter):
@@ -27,6 +28,16 @@ class ProductImageAdmin(admin.ModelAdmin):
     ordering = ['pk']
 
 
+class ProductImageInline(admin.TabularInline):
+    model = models.ProductImage
+    readonly_fields = ['thumbnail']
+
+    def thumbnail(self, instance):
+        if instance.image.name != '':
+            return format_html(f'<img src="{instance.image.url}" class="thumbnail"/>')
+        return ''
+
+
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['title', 'unit_price',
@@ -39,6 +50,7 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         'slug': ['title']
     }
+    inlines = [ProductImageInline]
 
     @admin.display(ordering='inventory')
     def inventory_status(self, product):
@@ -54,6 +66,11 @@ class ProductAdmin(admin.ModelAdmin):
         updated_count = queryset.update(inventory=0)
         self.message_user(
             request, f'{updated_count} products were successfully updated', messages.ERROR)
+
+    class Media:
+        css = {
+            'all': ['static_store/styles.css']
+        }
 
 
 @admin.register(models.Collection)
