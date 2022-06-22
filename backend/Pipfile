@@ -15,6 +15,7 @@ drf-nested-routers = "*"
 autopep8 = "*"
 pytest = "*"
 pytest-django = "*"
+locust = "*"
 
 [requires]
 python_version = "3.8"
