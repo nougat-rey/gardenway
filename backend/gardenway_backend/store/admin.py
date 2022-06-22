@@ -38,6 +38,11 @@ class ProductImageInline(admin.TabularInline):
         return ''
 
 
+class ProductReviewInline(admin.TabularInline):
+    model = models.ProductReview
+    readonly_fields = ['name', 'description']
+
+
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['title', 'unit_price',
@@ -50,7 +55,7 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         'slug': ['title']
     }
-    inlines = [ProductImageInline]
+    inlines = [ProductImageInline, ProductReviewInline]
 
     @admin.display(ordering='inventory')
     def inventory_status(self, product):
