@@ -56,8 +56,8 @@ MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
 
-if DEBUG:
-    MIDDLEWARE.append('silk.middleware.SilkyMiddleware')
+# if DEBUG:
+#    MIDDLEWARE.append('silk.middleware.SilkyMiddleware')
 
 ROOT_URLCONF = 'gardenway_backend.urls'
 
