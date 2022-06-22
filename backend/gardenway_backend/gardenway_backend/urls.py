@@ -30,6 +30,7 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
+    urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
 
 admin.site.site_header = "Gardenway Admin"
 admin.site.index_title = "Admin"
