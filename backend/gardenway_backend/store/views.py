@@ -1,9 +1,10 @@
 from django.db.models.aggregates import Count
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
-from .models import Collection, Product, OrderItem, ProductImage
-from .serializers import CollectionSerializer, ProductSerializer, ProductImageSerializer
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.mixins import CreateModelMixin
+from .models import Collection, Product, OrderItem, ProductImage, Cart
+from .serializers import CollectionSerializer, ProductSerializer, ProductImageSerializer, CartSerializer
 
 
 class ProductViewSet(ModelViewSet):
@@ -40,3 +41,8 @@ class ProductImageViewSet(ModelViewSet):
 
     def get_queryset(self):
         return ProductImage.objects.filter(product_id=self.kwargs['product_pk'])
+
+
+class CartViewSet(CreateModelMixin, GenericViewSet):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
