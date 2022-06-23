@@ -2,8 +2,8 @@ from django.db.models.aggregates import Count
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from .models import Collection, Product, OrderItem, ProductImage, Cart, CartItem, ProductReview
-from .serializers import AddCartItemSerializer, CollectionSerializer, ProductSerializer, ProductImageSerializer, CartSerializer, CartItemSerializer, UpdateCartItemSerializer, ProductReviewSerializer
+from .models import Collection, Product, OrderItem, ProductImage, Cart, CartItem, ProductReview, Order
+from .serializers import AddCartItemSerializer, CollectionSerializer, ProductSerializer, ProductImageSerializer, CartSerializer, CartItemSerializer, UpdateCartItemSerializer, ProductReviewSerializer, OrderSerializer
 
 
 class ProductViewSet(ModelViewSet):
@@ -75,3 +75,8 @@ class CartItemViewSet(ModelViewSet):
 
     def get_queryset(self):
         return CartItem.objects.filter(cart_id=self.kwargs['cart_pk']).select_related('product')
+
+
+class OrderViewSet(ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
