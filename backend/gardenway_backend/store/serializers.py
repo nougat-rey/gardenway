@@ -10,6 +10,14 @@ class UserCreateSerializer(BaseUserCreateSerializer):
                   'email', 'first_name', 'last_name']
 
 
+class CustomerSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Customer
+        fields = ['id', 'user_id', 'phone']
+
+
 class ProductImageSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         product_id = self.context['product_id']

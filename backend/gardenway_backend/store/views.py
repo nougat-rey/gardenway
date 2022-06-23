@@ -2,8 +2,8 @@ from django.db.models.aggregates import Count
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from .models import Collection, Product, OrderItem, ProductImage, ProductReview
-from .serializers import CollectionSerializer, ProductReviewSerializer, ProductSerializer, ProductImageSerializer
+from .models import Collection, Product, OrderItem, ProductImage, ProductReview, Customer
+from .serializers import CollectionSerializer, ProductReviewSerializer, ProductSerializer, ProductImageSerializer, CustomerSerializer
 
 
 class ProductViewSet(ModelViewSet):
@@ -51,3 +51,8 @@ class ProductReviewViewSet(ModelViewSet):
     def get_queryset(self):
         return ProductReview.objects.filter(
             product_id=self.kwargs['product_pk'])
+
+
+class CustomerViewSet(ModelViewSet):
+    queryset = Customer.objects.prefetch_related('carts', 'orders').all()
+    serializer_class = CustomerSerializer
