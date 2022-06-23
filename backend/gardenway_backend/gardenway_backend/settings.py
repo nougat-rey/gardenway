@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'store',
     'debug_toolbar',
     'rest_framework',
-    'silk'
+    'silk',
+    'djoser'
 ]
 
 MIDDLEWARE = [
