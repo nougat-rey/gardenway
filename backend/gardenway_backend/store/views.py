@@ -1,16 +1,20 @@
+from time import perf_counter
 from django.db.models.aggregates import Count
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from .models import Collection, Product, OrderItem, ProductImage, ProductReview, Customer
 from .serializers import CollectionSerializer, ProductReviewSerializer, ProductSerializer, ProductImageSerializer, CustomerSerializer
+from .permissions import IsAdminOrReadOnly
 
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.prefetch_related(
         'collections', 'images', 'reviews').order_by('title').all()
     serializer_class = ProductSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_serializer_context(self):
         return{'request': self.request}
@@ -26,6 +30,7 @@ class CollectionViewSet(ModelViewSet):
     queryset = Collection.objects.prefetch_related(
         'products').annotate(products_count=Count('products')).all().order_by('id')
     serializer_class = CollectionSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
     def destroy(self, request, *args, **kwargs):
         if Product.objects.filter(collection_id=kwargs['pk']).count() > 0:
@@ -35,6 +40,7 @@ class CollectionViewSet(ModelViewSet):
 
 class ProductImageViewSet(ModelViewSet):
     serializer_class = ProductImageSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_serializer_context(self):
         return {'product_id': self.kwargs['product_pk']}
@@ -46,6 +52,11 @@ class ProductImageViewSet(ModelViewSet):
 class ProductReviewViewSet(ModelViewSet):
     serializer_class = ProductReviewSerializer
 
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
     def get_serializer_context(self):
         return {'product_id': self.kwargs['product_pk']}
 
@@ -55,10 +66,11 @@ class ProductReviewViewSet(ModelViewSet):
 
 
 class CustomerViewSet(ModelViewSet):
-    queryset = Customer.objects.prefetch_related('carts', 'orders').all()
+    queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    permission_classes = [IsAdminUser]
 
-    @action(detail=False, methods=['GET', 'PUT'])
+    @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
     def me(self, request):
         (customer, created) = Customer.objects.get_or_create(
             user_id=request.user.id)
