@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from .models import Collection, Product, OrderItem, ProductImage, Cart, CartItem, ProductReview, Order
-from .serializers import AddCartItemSerializer, CollectionSerializer, ProductSerializer, ProductImageSerializer, CartSerializer, CartItemSerializer, UpdateCartItemSerializer, ProductReviewSerializer, OrderSerializer
+from .serializers import AddCartItemSerializer, CollectionSerializer, CreateOrderSerializer, ProductSerializer, ProductImageSerializer, CartSerializer, CartItemSerializer, UpdateCartItemSerializer, ProductReviewSerializer, OrderSerializer
 
 
 class ProductViewSet(ModelViewSet):
@@ -79,4 +79,11 @@ class CartItemViewSet(ModelViewSet):
 
 class OrderViewSet(ModelViewSet):
     queryset = Order.objects.all()
-    serializer_class = OrderSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateOrderSerializer
+        return OrderSerializer
+
+    def get_serializer_context(self):
+        return {'id': self.request.user.id}
