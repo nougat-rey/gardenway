@@ -157,5 +157,5 @@ class CreateOrderSerializer(serializers.Serializer):
 
     def save(self, **kwargs):
         (customer, created) = Customer.objects.get_or_create(
-            id=self.context['id'])
-        Order.objects.create(customer=customer)
+            id=self.context['user_id'])
+        return Order.objects.create(customer=customer)
