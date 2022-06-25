@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from .permissions import IsAdminOrReadOnly
 from .models import Collection, Product, ProductImage, ProductReview, Order, OrderItem, Customer, Cart, CartItem
-from .serializers import CollectionSerializer, ProductSerializer, ProductImageSerializer, ProductReviewSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer, OrderSerializer,  CreateOrderSerializer, CustomerSerializer
+from .serializers import CollectionSerializer, ProductSerializer, ProductImageSerializer, ProductReviewSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer, OrderSerializer,  CreateOrderSerializer, CustomerSerializer, UpdateOrderSerializer
 
 
 class ProductViewSet(ModelViewSet):
@@ -96,7 +96,7 @@ class OrderViewSet(ModelViewSet):
     def get_permissions(self):
         if self.request.method in ['PATCH', 'DELETE']:
             return[IsAdminUser()]
-        return [IsAuthenticated]
+        return [IsAuthenticated()]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
