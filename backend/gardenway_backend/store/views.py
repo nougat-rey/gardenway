@@ -68,11 +68,13 @@ class ProductReviewViewSet(ModelViewSet):
 class CartViewSet(ModelViewSet):
     queryset = Cart.objects.prefetch_related('items__product').all()
     serializer_class = CartSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class CartItemViewSet(ModelViewSet):
 
     http_method_names = ['get', 'post', 'patch', 'delete']
+    permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
