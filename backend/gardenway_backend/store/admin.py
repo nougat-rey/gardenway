@@ -1,7 +1,21 @@
 from django.contrib import admin, messages
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.db.models.aggregates import Count
-from . import models
 from django.utils.html import format_html
+from . import models
+
+
+@admin.register(models.User)
+class UserAdmin(BaseUserAdmin):
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("username", "password1", "password2", "email", "first_name", "last_name"),
+            },
+        ),
+    )
 
 
 class InventoryFilter(admin.SimpleListFilter):
@@ -97,9 +111,12 @@ class CollectionAdmin(admin.ModelAdmin):
 
 @admin.register(models.Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name', 'email', 'phone']
+    list_select_related = ['user']
+    list_display = ['first_name', 'last_name', 'phone']
     list_per_page = 10
-    search_fields = ['first_name__istartswith', 'last_name__istartswith']
+    ordering = ['user__first_name', 'user__last_name']
+    search_fields = ['user__first_name__istartswith',
+                     'user__last_name__istartswith']
 
 
 class PromotionFilter(admin.SimpleListFilter):
@@ -123,7 +140,7 @@ class PromotionFilter(admin.SimpleListFilter):
             return queryset.filter(discount__lt=100).filter(discount__gt=50)
 
 
-@ admin.register(models.Promotion)
+@admin.register(models.Promotion)
 class PromotionAdmin(admin.ModelAdmin):
     list_display = ['description', 'discount']
     list_per_page = 10
@@ -138,7 +155,7 @@ class OrderItemInline(admin.TabularInline):
     model = models.OrderItem
 
 
-@ admin.register(models.Order)
+@admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     autocomplete_fields = ['customer']
     inlines = [OrderItemInline]
@@ -155,7 +172,7 @@ class CartItemInline(admin.TabularInline):
     model = models.CartItem
 
 
-@ admin.register(models.Cart)
+@admin.register(models.Cart)
 class CartAdmin(admin.ModelAdmin):
     autocomplete_fields = ['customer']
     inlines = [CartItemInline]

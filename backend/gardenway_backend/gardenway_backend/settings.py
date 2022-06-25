@@ -14,6 +14,7 @@ from pathlib import Path
 from gardenway_backend.dev import DEV_SECRET_KEY, DB_PASSWORD
 import os
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,7 +30,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'store',
     'debug_toolbar',
     'rest_framework',
-    'silk'
+    'silk',
+    'djoser'
 ]
 
 MIDDLEWARE = [
@@ -120,6 +121,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'store.User'
+
+DJOSER = {
+    'SERIALIZERS': {
+        'user_create': 'store.serializers.UserCreateSerializer',
+        'current_user': 'store.serializers.UserSerializer'
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/

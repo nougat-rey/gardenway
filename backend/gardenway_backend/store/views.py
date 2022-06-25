@@ -1,15 +1,20 @@
+from time import perf_counter
 from django.db.models.aggregates import Count
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from .models import Collection, Product, OrderItem, ProductImage, Cart, CartItem, ProductReview, Order
-from .serializers import AddCartItemSerializer, CollectionSerializer, CreateOrderSerializer, ProductSerializer, ProductImageSerializer, CartSerializer, CartItemSerializer, UpdateCartItemSerializer, ProductReviewSerializer, OrderSerializer
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
+from .permissions import IsAdminOrReadOnly
+from .models import Collection, Product, ProductImage, ProductReview, Order, OrderItem, Customer, Cart, CartItem
+from .serializers import CollectionSerializer, ProductSerializer, ProductImageSerializer, ProductReviewSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer, OrderSerializer,  CreateOrderSerializer, CustomerSerializer
 
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.prefetch_related(
         'collections', 'images', 'reviews').order_by('title').all()
     serializer_class = ProductSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_serializer_context(self):
         return{'request': self.request}
@@ -25,6 +30,7 @@ class CollectionViewSet(ModelViewSet):
     queryset = Collection.objects.prefetch_related(
         'products').annotate(products_count=Count('products')).all().order_by('id')
     serializer_class = CollectionSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
     def destroy(self, request, *args, **kwargs):
         if Product.objects.filter(collection_id=kwargs['pk']).count() > 0:
@@ -34,6 +40,7 @@ class CollectionViewSet(ModelViewSet):
 
 class ProductImageViewSet(ModelViewSet):
     serializer_class = ProductImageSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_serializer_context(self):
         return {'product_id': self.kwargs['product_pk']}
@@ -44,6 +51,11 @@ class ProductImageViewSet(ModelViewSet):
 
 class ProductReviewViewSet(ModelViewSet):
     serializer_class = ProductReviewSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     def get_serializer_context(self):
         return {'product_id': self.kwargs['product_pk']}
@@ -87,3 +99,22 @@ class OrderViewSet(ModelViewSet):
 
     def get_serializer_context(self):
         return {'id': self.request.user.id}
+
+
+class CustomerViewSet(ModelViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
+    permission_classes = [IsAdminUser]
+
+    @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
+    def me(self, request):
+        (customer, created) = Customer.objects.get_or_create(
+            user_id=request.user.id)
+        if request.method == 'GET':
+            serializer = CustomerSerializer(customer)
+            return Response(serializer.data)
+        elif request.method == 'PUT':
+            serializer = CustomerSerializer(customer, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
