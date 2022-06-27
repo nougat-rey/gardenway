@@ -1,4 +1,4 @@
-# gardenway
+![Gardenway](images/banner.png)
 
 ## Intro
 
