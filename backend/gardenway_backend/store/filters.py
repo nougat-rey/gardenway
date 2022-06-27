@@ -18,7 +18,8 @@ class OrderFilter(FilterSet):
         model = Order
         fields = {
             'payment_status': ['exact'],
-            'customer_id': ['exact']
+            'customer_id': ['exact'],
+            'placed_at': ['gt', 'lt']
         }
 
 
