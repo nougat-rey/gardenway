@@ -9,7 +9,7 @@ from .permissions import IsAdminOrReadOnly
 from .models import Collection, Product, ProductImage, ProductReview, Order, OrderItem, Customer, Cart, CartItem
 from .serializers import CollectionSerializer, ProductSerializer, ProductImageSerializer, ProductReviewSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer, OrderSerializer,  CreateOrderSerializer, CustomerSerializer, UpdateOrderSerializer
 from django_filters.rest_framework import DjangoFilterBackend
-from .filters import ProductFilter, OrderFilter
+from .filters import ProductFilter, OrderFilter, CartFilter
 
 
 class ProductViewSet(ModelViewSet):
@@ -73,6 +73,8 @@ class CartViewSet(ModelViewSet):
     queryset = Cart.objects.prefetch_related('items__product').all()
     serializer_class = CartSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = CartFilter
 
 
 class CartItemViewSet(ModelViewSet):

@@ -1,5 +1,6 @@
+from re import I
 from django_filters.rest_framework import FilterSet
-from .models import Product, Order
+from .models import Product, Order, Cart
 
 
 class ProductFilter(FilterSet):
@@ -18,4 +19,13 @@ class OrderFilter(FilterSet):
         fields = {
             'payment_status': ['exact'],
             'customer_id': ['exact']
+        }
+
+
+class CartFilter(FilterSet):
+    class Meta:
+        model = Cart
+        fields = {
+            'customer': ['exact'],
+            'created_at': ['gt', 'lt']
         }
