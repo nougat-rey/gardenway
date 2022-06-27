@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from .permissions import IsAdminOrReadOnly
 from .models import Collection, Product, ProductImage, ProductReview, Order, OrderItem, Customer, Cart, CartItem
@@ -17,8 +18,10 @@ class ProductViewSet(ModelViewSet):
         'collections', 'images', 'reviews').order_by('title').all()
     serializer_class = ProductSerializer
     permission_classes = [IsAdminOrReadOnly]
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ProductFilter
+    search_fields = ['title', 'description']
+    ordering_fields = ['slug', 'unit_price', 'last_update']
 
     def get_serializer_context(self):
         return{'request': self.request}
@@ -35,6 +38,9 @@ class CollectionViewSet(ModelViewSet):
         'products').annotate(products_count=Count('products')).all().order_by('id')
     serializer_class = CollectionSerializer
     permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['title']
+    ordering_fields = ['slug']
 
     def destroy(self, request, *args, **kwargs):
         if Product.objects.filter(collection_id=kwargs['pk']).count() > 0:
@@ -73,8 +79,9 @@ class CartViewSet(ModelViewSet):
     queryset = Cart.objects.prefetch_related('items__product').all()
     serializer_class = CartSerializer
     permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = CartFilter
+    ordering_fields = ['created_at']
 
 
 class CartItemViewSet(ModelViewSet):
@@ -100,8 +107,9 @@ class CartItemViewSet(ModelViewSet):
 class OrderViewSet(ModelViewSet):
     queryset = Order.objects.all()
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = OrderFilter
+    ordering_fields = ['placed_at']
 
     def get_permissions(self):
         if self.request.method in ['PATCH', 'DELETE']:
