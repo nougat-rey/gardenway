@@ -10,6 +10,7 @@ from .models import Collection, Product, ProductImage, ProductReview, Order, Ord
 from .serializers import CollectionSerializer, ProductSerializer, ProductImageSerializer, ProductReviewSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer, OrderSerializer,  CreateOrderSerializer, CustomerSerializer, UpdateOrderSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import ProductFilter, OrderFilter, CartFilter
+from rest_framework.filters import SearchFilter
 
 
 class ProductViewSet(ModelViewSet):
@@ -17,8 +18,9 @@ class ProductViewSet(ModelViewSet):
         'collections', 'images', 'reviews').order_by('title').all()
     serializer_class = ProductSerializer
     permission_classes = [IsAdminOrReadOnly]
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_class = ProductFilter
+    search_fields = ['title', 'description']
 
     def get_serializer_context(self):
         return{'request': self.request}
@@ -35,6 +37,8 @@ class CollectionViewSet(ModelViewSet):
         'products').annotate(products_count=Count('products')).all().order_by('id')
     serializer_class = CollectionSerializer
     permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [SearchFilter]
+    search_fields = ['title']
 
     def destroy(self, request, *args, **kwargs):
         if Product.objects.filter(collection_id=kwargs['pk']).count() > 0:
