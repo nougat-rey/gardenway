@@ -18,6 +18,7 @@ from django.urls import path
 from django.conf.urls import include
 from django.conf.urls.static import static
 from django.conf import settings
+from django.views.generic import TemplateView
 
 import debug_toolbar
 
@@ -25,7 +26,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('__debug__/', include(debug_toolbar.urls)),
     path('store/', include('store.urls')),
-    path('auth/', include('djoser.urls'))
+    path('auth/', include('djoser.urls')),
+    path('', TemplateView.as_view(template_name='store/index.html'))
 ]
 
 if settings.DEBUG:
