@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from .permissions import IsAdminOrReadOnly
 from .models import Collection, Product, ProductImage, ProductReview, Order, OrderItem, Customer, Cart, CartItem
 from .serializers import CollectionSerializer, ProductSerializer, ProductImageSerializer, ProductReviewSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer, OrderSerializer,  CreateOrderSerializer, CustomerSerializer, UpdateOrderSerializer
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import ProductFilter
 
 
 class ProductViewSet(ModelViewSet):
@@ -15,6 +17,8 @@ class ProductViewSet(ModelViewSet):
         'collections', 'images', 'reviews').order_by('title').all()
     serializer_class = ProductSerializer
     permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProductFilter
 
     def get_serializer_context(self):
         return{'request': self.request}
