@@ -9,7 +9,7 @@ from .permissions import IsAdminOrReadOnly
 from .models import Collection, Product, ProductImage, ProductReview, Order, OrderItem, Customer, Cart, CartItem
 from .serializers import CollectionSerializer, ProductSerializer, ProductImageSerializer, ProductReviewSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer, OrderSerializer,  CreateOrderSerializer, CustomerSerializer, UpdateOrderSerializer
 from django_filters.rest_framework import DjangoFilterBackend
-from .filters import ProductFilter
+from .filters import ProductFilter, OrderFilter
 
 
 class ProductViewSet(ModelViewSet):
@@ -98,6 +98,8 @@ class CartItemViewSet(ModelViewSet):
 class OrderViewSet(ModelViewSet):
     queryset = Order.objects.all()
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = OrderFilter
 
     def get_permissions(self):
         if self.request.method in ['PATCH', 'DELETE']:
