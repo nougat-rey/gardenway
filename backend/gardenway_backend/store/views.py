@@ -42,11 +42,6 @@ class CollectionViewSet(ModelViewSet):
     search_fields = ['title']
     ordering_fields = ['slug']
 
-    def destroy(self, request, *args, **kwargs):
-        if Product.objects.filter(collection_id=kwargs['pk']).count() > 0:
-            return Response({'error': 'Collection cannot be deleted because it includes one or more products.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        return super().destroy(request, *args, **kwargs)
-
 
 class ProductImageViewSet(ModelViewSet):
     serializer_class = ProductImageSerializer
