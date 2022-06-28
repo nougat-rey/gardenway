@@ -4,6 +4,7 @@ from rest_framework_nested import routers
 router = routers.DefaultRouter()
 router.register('products', ProductViewSet)
 router.register('collections', CollectionViewSet)
+router.register('promotions', PromotionViewSet)
 router.register('carts', CartViewSet)
 router.register('orders', OrderViewSet)
 router.register('customers', CustomerViewSet)

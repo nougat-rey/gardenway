@@ -150,3 +150,13 @@ class CustomerViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+
+
+class PromotionViewSet(ModelViewSet):
+    queryset = Promotion.objects.prefetch_related(
+        'products').all()
+    serializer_class = PromotionSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    #filter_backends = [SearchFilter, OrderFilter]
+    #search_fields = ['description']
+    #ordering_fields = ['discount']
