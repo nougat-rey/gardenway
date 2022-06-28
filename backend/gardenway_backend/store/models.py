@@ -1,4 +1,4 @@
-from django.core.validators import MinValueValidator, MaxLengthValidator, validate_image_file_extension
+from django.core.validators import MinValueValidator, MaxValueValidator, validate_image_file_extension
 from django.db import models
 from uuid import uuid4
 from django.contrib.auth.models import AbstractUser
@@ -14,7 +14,7 @@ class User(AbstractUser):
 class Promotion(models.Model):
     description = models.CharField(max_length=255)
     discount = models.FloatField(
-        validators=[MinValueValidator(1), MaxLengthValidator(99)])
+        validators=[MinValueValidator(1), MaxValueValidator(99)])
 
     def __str__(self):
         return self.description
@@ -44,7 +44,8 @@ class Product(models.Model):
     last_update = models.DateTimeField(auto_now=True)
     collections = models.ManyToManyField(
         Collection, blank=True, related_name='products')
-    promotions = models.ManyToManyField(Promotion, blank=True)
+    promotions = models.ManyToManyField(
+        Promotion, blank=True, related_name='products')
 
     def __str__(self):
         return self.title
