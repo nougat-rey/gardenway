@@ -46,7 +46,7 @@ class ProductReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductReview
-        fields = ['product', 'name', 'description', 'date']
+        fields = ['product', 'rating', 'name', 'description', 'date']
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -174,3 +174,9 @@ class UpdateOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['payment_status']
+
+
+class PromotionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Promotion
+        fields = ['description', 'discount', 'products']

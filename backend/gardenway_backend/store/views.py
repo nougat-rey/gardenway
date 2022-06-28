@@ -7,10 +7,10 @@ from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from .permissions import IsAdminOrReadOnly
-from .models import Collection, Product, ProductImage, ProductReview, Order, OrderItem, Customer, Cart, CartItem
-from .serializers import CollectionSerializer, ProductSerializer, ProductImageSerializer, ProductReviewSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer, OrderSerializer,  CreateOrderSerializer, CustomerSerializer, UpdateOrderSerializer
+from .models import *
+from .serializers import *
 from django_filters.rest_framework import DjangoFilterBackend
-from .filters import ProductFilter, OrderFilter, CartFilter
+from .filters import *
 
 
 class ProductViewSet(ModelViewSet):
@@ -42,11 +42,6 @@ class CollectionViewSet(ModelViewSet):
     search_fields = ['title']
     ordering_fields = ['slug']
 
-    def destroy(self, request, *args, **kwargs):
-        if Product.objects.filter(collection_id=kwargs['pk']).count() > 0:
-            return Response({'error': 'Collection cannot be deleted because it includes one or more products.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        return super().destroy(request, *args, **kwargs)
-
 
 class ProductImageViewSet(ModelViewSet):
     serializer_class = ProductImageSerializer
@@ -61,6 +56,10 @@ class ProductImageViewSet(ModelViewSet):
 
 class ProductReviewViewSet(ModelViewSet):
     serializer_class = ProductReviewSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = ProductReviewFilter
+    search_fields = ['name', 'description']
+    ordering_fields = ['rating']
 
     def get_permissions(self):
         if self.request.method == 'GET':
@@ -150,3 +149,13 @@ class CustomerViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+
+
+class PromotionViewSet(ModelViewSet):
+    queryset = Promotion.objects.prefetch_related('products').all()
+    serializer_class = PromotionSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = PromotionFilter
+    search_fields = ['description']
+    ordering_fields = ['discount']
