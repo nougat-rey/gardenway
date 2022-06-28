@@ -10,7 +10,7 @@ from .permissions import IsAdminOrReadOnly
 from .models import *
 from .serializers import *
 from django_filters.rest_framework import DjangoFilterBackend
-from .filters import ProductFilter, OrderFilter, CartFilter
+from .filters import *
 
 
 class ProductViewSet(ModelViewSet):
@@ -61,6 +61,10 @@ class ProductImageViewSet(ModelViewSet):
 
 class ProductReviewViewSet(ModelViewSet):
     serializer_class = ProductReviewSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = ProductReviewFilter
+    search_fields = ['name', 'description']
+    ordering_fields = ['rating']
 
     def get_permissions(self):
         if self.request.method == 'GET':
@@ -153,10 +157,10 @@ class CustomerViewSet(ModelViewSet):
 
 
 class PromotionViewSet(ModelViewSet):
-    queryset = Promotion.objects.prefetch_related(
-        'products').all()
+    queryset = Promotion.objects.prefetch_related('products').all()
     serializer_class = PromotionSerializer
     permission_classes = [IsAdminOrReadOnly]
-    #filter_backends = [SearchFilter, OrderFilter]
-    #search_fields = ['description']
-    #ordering_fields = ['discount']
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = PromotionFilter
+    search_fields = ['description']
+    ordering_fields = ['discount']

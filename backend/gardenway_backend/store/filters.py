@@ -1,6 +1,6 @@
 from re import I
 from django_filters.rest_framework import FilterSet
-from .models import Product, Order, Cart
+from .models import Product, Order, Cart, ProductReview, Promotion
 
 
 class ProductFilter(FilterSet):
@@ -29,4 +29,21 @@ class CartFilter(FilterSet):
         fields = {
             'customer': ['exact'],
             'created_at': ['gt', 'lt']
+        }
+
+
+class ProductReviewFilter(FilterSet):
+    class Meta:
+        model = ProductReview
+        fields = {
+            'rating': ['gt'],
+            'date': ['gt', 'lt']
+        }
+
+
+class PromotionFilter(FilterSet):
+    class Meta:
+        model = Promotion
+        fields = {
+            'discount': ['gt', 'lt']
         }
