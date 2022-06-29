@@ -108,6 +108,7 @@ class Order(models.Model):
     payment_status = models.CharField(
         max_length=1, choices=PAYMENT_STATUS_CHOICES, default=PAYMENT_STATUS_PENDING)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+    id = models.UUIDField(primary_key=True, default=uuid4)
 
 
 class OrderItem(models.Model):
