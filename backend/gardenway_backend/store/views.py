@@ -13,7 +13,7 @@ from .filters import *
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.prefetch_related(
-        'collections', 'images', 'reviews').order_by('title').all()
+        'images', 'reviews').order_by('title').all()
     serializer_class = ProductSerializer
     permission_classes = [IsAdminOrReadOnly]
     filterset_class = ProductFilter
@@ -98,7 +98,7 @@ class CartItemViewSet(ModelViewSet):
 
 
 class OrderViewSet(ModelViewSet):
-    queryset = Order.objects.all()
+    queryset = Order.objects.prefetch_related('items__product').all()
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
     filterset_class = OrderFilter
     ordering_fields = ['placed_at']
