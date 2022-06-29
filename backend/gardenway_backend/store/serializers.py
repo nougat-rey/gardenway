@@ -3,6 +3,8 @@ from decimal import Decimal
 from .models import *
 from djoser.serializers import UserSerializer as BaseUserSerializer, UserCreateSerializer as BaseUserCreateSerializer
 
+TAX = 1.13
+
 
 class UserSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
@@ -58,7 +60,7 @@ class ProductSerializer(serializers.ModelSerializer):
     reviews = ProductReviewSerializer(many=True, read_only=True)
 
     def calculate_tax(self, product):
-        return product.unit_price*Decimal(1.1)
+        return round(product.unit_price*Decimal(TAX), 2)
 
     class Meta:
         model = Product
@@ -77,13 +79,18 @@ class CollectionSerializer(serializers.ModelSerializer):
 class CartItemSerializer(serializers.ModelSerializer):
     product = SimpleProductSerializer()
     total_price = serializers.SerializerMethodField()
+    total_price_with_tax = serializers.SerializerMethodField()
 
     def get_total_price(self, cart_item):
-        return cart_item.quantity * cart_item.product.unit_price
+        return round(cart_item.quantity * cart_item.product.unit_price, 2)
+
+    def get_total_price_with_tax(self, cart_item):
+        return round(self.get_total_price(cart_item)*Decimal(TAX), 2)
 
     class Meta:
         model = CartItem
-        fields = ['id', 'product', 'quantity', 'total_price']
+        fields = ['id', 'product', 'quantity',
+                  'total_price', 'total_price_with_tax']
 
 
 class CartSerializer(serializers.ModelSerializer):
@@ -91,13 +98,18 @@ class CartSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(read_only=True)
     items = CartItemSerializer(many=True, read_only=True)
     total_price = serializers.SerializerMethodField()
+    total_price_with_tax = serializers.SerializerMethodField()
 
     def get_total_price(self, cart):
-        return sum([item.quantity * item.product.unit_price for item in cart.items.all()])
+        return round(sum([item.quantity * item.product.unit_price for item in cart.items.all()]), 2)
+
+    def get_total_price_with_tax(self, cart):
+        return round(self.get_total_price(cart)*Decimal(TAX), 2)
 
     class Meta:
         model = Cart
-        fields = ['id', 'customer', 'items', 'total_price', 'created_at']
+        fields = ['id', 'customer', 'items', 'total_price',
+                  'total_price_with_tax', 'created_at']
 
 
 class AddCartItemSerializer(serializers.ModelSerializer):
@@ -139,18 +151,36 @@ class UpdateCartItemSerializer(serializers.ModelSerializer):
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product = SimpleProductSerializer()
+    total_price = serializers.SerializerMethodField()
+    total_price_with_tax = serializers.SerializerMethodField()
+
+    def get_total_price(self, order_item):
+        return round(order_item.quantity * order_item.product.unit_price, 2)
+
+    def get_total_price_with_tax(self, order_item):
+        return round(self.get_total_price(order_item)*Decimal(TAX), 2)
 
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'unit_price', 'quantity']
+        fields = ['id', 'product', 'quantity',
+                  'total_price', 'total_price_with_tax']
 
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
+    total_price = serializers.SerializerMethodField()
+    total_price_with_tax = serializers.SerializerMethodField()
+
+    def get_total_price(self, order):
+        return round(sum([item.quantity * item.product.unit_price for item in order.items.all()]), 2)
+
+    def get_total_price_with_tax(self, order):
+        return round(self.get_total_price(order)*Decimal(TAX), 2)
 
     class Meta:
         model = Order
-        fields = ['id', 'customer', 'placed_at', 'payment_status', 'items']
+        fields = ['id', 'customer', 'placed_at', 'payment_status',
+                  'items', 'total_price', 'total_price_with_tax']
 
 
 class CreateOrderSerializer(serializers.Serializer):
