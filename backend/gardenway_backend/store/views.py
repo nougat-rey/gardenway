@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
-from .permissions import IsAdminOrReadOnly, IsAdminOrCartOwner, IsAdminOrOrderOwner
+from .permissions import IsAdminOrReadOnly, IsAdminOrOwner
 from .models import *
 from .serializers import *
 from .filters import *
@@ -81,7 +81,7 @@ class CartViewSet(ModelViewSet):
         elif self.action == 'create':
             return [IsAuthenticated()]
         elif self.action == 'retrieve':
-            return [IsAdminOrCartOwner()]
+            return [IsAdminOrOwner()]
         return [IsAdminUser()]
 
 
@@ -117,7 +117,7 @@ class OrderViewSet(ModelViewSet):
         elif self.action == 'create':
             return [IsAuthenticated()]
         elif self.action == 'retrieve':
-            return [IsAdminOrOrderOwner()]
+            return [IsAdminOrOwner()]
         return [IsAdminUser()]
 
     def get_serializer_class(self):
