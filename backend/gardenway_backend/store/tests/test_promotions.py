@@ -39,6 +39,7 @@ class TestCreatePromotion:
     def test_returns_403_from_non_admin(self):
         # Arrange
         client = APIClient()
+        client.force_authenticate(user=User(is_staff=False))
 
         # Act
         response = client.post(self.url, self.get_valid_data())

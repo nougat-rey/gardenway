@@ -32,6 +32,7 @@ class TestCreateCollection:
 
         # Arrange
         client = APIClient()
+        client.force_authenticate(user=User(is_staff=False))
 
         # Act
         response = client.post(self.url, self.get_valid_data())
