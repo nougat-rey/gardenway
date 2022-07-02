@@ -209,4 +209,4 @@ class UpdateOrderSerializer(serializers.ModelSerializer):
 class PromotionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Promotion
-        fields = ['title', 'slug', 'description', 'discount', 'products']
+        fields = ['id', 'title', 'slug', 'description', 'discount', 'products']
