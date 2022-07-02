@@ -20,6 +20,7 @@ pytest = "*"
 pytest-django = "*"
 locust = "*"
 django-silk = "*"
+model-bakery = "*"
 
 [requires]
 python_version = "3.8"
