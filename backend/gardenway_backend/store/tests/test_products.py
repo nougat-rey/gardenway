@@ -7,6 +7,8 @@ import pytest
 @pytest.mark.django_db
 class TestCreateProduct:
 
+    url = '/store/products/'
+
     def get_valid_data(self):
         return {
             "title": "test",
@@ -28,7 +30,7 @@ class TestCreateProduct:
         client.force_authenticate(user=User(is_staff=True))
 
         # Act
-        response = client.post('/store/products/', self.get_valid_data())
+        response = client.post(self.url, self.get_valid_data())
 
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
@@ -39,7 +41,7 @@ class TestCreateProduct:
         client = APIClient()
 
         # Act
-        response = client.post('/store/products/', self.get_valid_data())
+        response = client.post(self.url, self.get_valid_data())
 
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -53,15 +55,15 @@ class TestCreateProduct:
 
         # 1. invalid title
         response = client.post(
-            '/store/products/', self.get_invalid_data("title", 10))
+            self.url, self.get_invalid_data("title", 10))
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
         # 2. invalid price
         response = client.post(
-            '/store/products/', self.get_invalid_data("price", 0))
+            self.url, self.get_invalid_data("price", 0))
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
         # 3. invalid inventory
         response = client.post(
-            '/store/products/', self.get_invalid_data("inventory", -1))
+            self.url, self.get_invalid_data("inventory", -1))
         assert response.status_code == status.HTTP_400_BAD_REQUEST

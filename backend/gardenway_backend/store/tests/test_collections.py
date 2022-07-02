@@ -7,9 +7,12 @@ import pytest
 @pytest.mark.django_db
 class TestCreateCollection:
 
+    url = '/store/collections/'
+
     def get_valid_data(self):
         return {
-            "title": "test"
+            "title": "test",
+            "slug": "test"
         }
 
     def test_returns_201(self):
@@ -19,7 +22,7 @@ class TestCreateCollection:
         client.force_authenticate(user=User(is_staff=True))
 
         # Act
-        response = client.post('/store/collections/', self.get_valid_data())
+        response = client.post(self.url, self.get_valid_data())
 
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
@@ -31,7 +34,7 @@ class TestCreateCollection:
         client = APIClient()
 
         # Act
-        response = client.post('/store/collections/', self.get_valid_data())
+        response = client.post(self.url, self.get_valid_data())
 
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -43,7 +46,7 @@ class TestCreateCollection:
         client.force_authenticate(user=User(is_staff=True))
 
         # Act
-        response = client.post('/store/collections/', {"bread": "bread"})
+        response = client.post(self.url, {"bread": "bread"})
 
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
