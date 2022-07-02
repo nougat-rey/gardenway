@@ -115,7 +115,7 @@ class OrderViewSet(ModelViewSet):
         if self.action == 'list' or self.action == 'destroy':
             return [IsAdminUser()]
         elif self.action == 'create':
-            return [IsAuthenticated()]
+            return [IsAuthenticated]
         elif self.action == 'retrieve':
             return [IsAdminOrOwner()]
         return [IsAdminUser()]
@@ -128,13 +128,19 @@ class OrderViewSet(ModelViewSet):
         return OrderSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = CreateOrderSerializer(data=request.data, context={
-                                           'user_id': self.request.user.id})
-        serializer.is_valid(raise_exception=True)
-        order = serializer.save()
+        if self.request.user.id:
+            serializer = CreateOrderSerializer(data=request.data, context={
+                'user_id': self.request.user.id})
+            serializer.is_valid(raise_exception=True)
+            order = serializer.save()
 
-        serializer = OrderSerializer(order)
-        return Response(serializer.data)
+            serializer = OrderSerializer(order)
+            response = Response(serializer.data)
+        else:
+            # anonymous user does not have a user id to add to the request
+            response = Response({'error': 'Anonymous user cannot create an order.'},
+                                status=status.HTTP_403_FORBIDDEN)
+        return response
 
 
 class CustomerViewSet(ModelViewSet):

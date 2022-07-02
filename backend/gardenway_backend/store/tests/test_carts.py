@@ -36,7 +36,6 @@ class TestCreateCart:
         response = client.post(self.url, self.get_valid_data())
 
         # Assert
-        print(response.data)
         assert response.status_code == status.HTTP_201_CREATED
         assert is_valid_uuid(response.data['id'])
 
