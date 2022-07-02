@@ -24,7 +24,7 @@ class Promotion(models.Model):
 
 
 class Collection(models.Model):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, unique=True)
     slug = models.SlugField()
 
     def __str__(self):
@@ -35,7 +35,7 @@ class Collection(models.Model):
 
 
 class Product(models.Model):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, unique=True)
     slug = models.SlugField()
     description = models.TextField(null=True, blank=True)
     unit_price = models.DecimalField(
