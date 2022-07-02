@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.test import APIClient
+from django.contrib.auth.models import User
 import pytest
 
 
@@ -12,6 +13,7 @@ class TestCreateCollection:
 
         # Act
         client = APIClient()
+        client.force_authenticate(user=User(is_staff=True))
         response = client.post('/store/collections/', {'title': 'a'})
 
         # Assert
