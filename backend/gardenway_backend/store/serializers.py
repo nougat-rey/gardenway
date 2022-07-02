@@ -71,7 +71,7 @@ class ProductSerializer(serializers.ModelSerializer):
 class CollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Collection
-        fields = ['id', 'title', 'products_count', 'products']
+        fields = ['id', 'title', 'slug', 'products_count', 'products']
 
     products_count = serializers.IntegerField(read_only=True)
 
@@ -209,4 +209,4 @@ class UpdateOrderSerializer(serializers.ModelSerializer):
 class PromotionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Promotion
-        fields = ['description', 'discount', 'products']
+        fields = ['title', 'slug', 'description', 'discount', 'products']
