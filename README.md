@@ -1,4 +1,4 @@
-# gardenway
+![Gardenway](images/banner.png)
 
 ## Intro
 
@@ -28,8 +28,10 @@ Frontend will be built using ReactJS.
 
 2. Set own DEV_SECRET_KEY & DB_PASSWORD in dev.py
 
-`DEV_SECRET_KEY = <secret key>`
-`DB_PASSWORD = <mysql password>`
+```
+DEV_SECRET_KEY = <secret key>
+DB_PASSWORD = <mysql password>
+```
 
 - The following can be used to generate a secret key, which can be hard-coded into the config file:
 
@@ -41,34 +43,42 @@ Frontend will be built using ReactJS.
 
 `mysql -u root -p <mysql password>`
 
-2. Create and use database 'store'
+2. Create and use database 'store':
 
-`mysql> create database store;`
-`use store;`
+```
+mysql> create database store;
+use store;
+```
 
-3. Create superuser
+3. Create superuser:
 
-`cd <project root>/backend/gardenway_backend/`
-`python manage.py createsuperuser`
+```
+cd <project root>/backend/gardenway_backend/
+python manage.py createsuperuser
+```
 
 - Follow the instructions to create superuser
 
-4. Migrate django objects into database
+4. Migrate django objects into database:
 
-`cd <project root>/backend/gardenway_backend/`
-`python manage.py makemigrations store`
-`python manage.py makemigrations`
-`python manage.py migrate`
+```
+cd <project root>/backend/gardenway_backend/
+python manage.py makemigrations store
+python manage.py makemigrations
+python manage.py migrate
+```
 
-5. Populate 'store'
+5. Populate 'store':
 
-`cd <project root>/backend/gardenway_backend/seeds`
-`mysql -u root -p <password>`
-`mysql> source seed.sql`
+```
+cd <project root>/backend/gardenway_backend/seeds
+mysql -u root -p <password>
+mysql> source seed.sql
+```
 
 ### Start up backend
 
-1. Run server
+1. Run server:
 
 `python manage.py runserver`
 

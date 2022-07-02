@@ -1,11 +1,10 @@
-from time import perf_counter
 from django.db.models.aggregates import Count
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
-from .permissions import IsAdminOrReadOnly
+from .permissions import IsAdminOrReadOnly, IsAdminOrOwner
 from .models import *
 from .serializers import *
 from .filters import *
@@ -76,6 +75,15 @@ class CartViewSet(ModelViewSet):
     filterset_class = CartFilter
     ordering_fields = ['created_at']
 
+    def get_permissions(self):
+        if self.action == 'list' or self.action == 'destroy':
+            return [IsAdminUser()]
+        elif self.action == 'create':
+            return [IsAuthenticated()]
+        elif self.action == 'retrieve':
+            return [IsAdminOrOwner()]
+        return [IsAdminUser()]
+
 
 class CartItemViewSet(ModelViewSet):
 
@@ -104,9 +112,13 @@ class OrderViewSet(ModelViewSet):
     ordering_fields = ['placed_at']
 
     def get_permissions(self):
-        if self.request.method in ['PATCH', 'DELETE']:
-            return[IsAdminUser()]
-        return [IsAuthenticated()]
+        if self.action == 'list' or self.action == 'destroy':
+            return [IsAdminUser()]
+        elif self.action == 'create':
+            return [IsAuthenticated()]
+        elif self.action == 'retrieve':
+            return [IsAdminOrOwner()]
+        return [IsAdminUser()]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
