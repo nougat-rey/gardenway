@@ -9,11 +9,10 @@ class TestCreateProduct:
     def test_returns_201(self):
 
         # Arrange
-        # none required
-
-        # Act
         client = APIClient()
         client.force_authenticate(user=User(is_staff=True))
+        # Act
+
         response = client.post('/store/products/',
                                {
                                    "title": "test",
@@ -23,8 +22,7 @@ class TestCreateProduct:
                                    "inventory": 20
                                }
                                )
-        print("Test")
-        print(response.data)
+
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data['id'] > 0

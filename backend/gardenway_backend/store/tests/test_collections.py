@@ -9,11 +9,10 @@ class TestCreateCollection:
     def test_returns_201(self):
 
         # Arrange
-        # none required
-
-        # Act
         client = APIClient()
         client.force_authenticate(user=User(is_staff=True))
+
+        # Act
         response = client.post('/store/collections/', {'title': 'a'})
 
         # Assert
