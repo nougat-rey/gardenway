@@ -12,6 +12,8 @@ class User(AbstractUser):
 
 
 class Promotion(models.Model):
+    title = models.CharField(max_length=255, unique=True)
+    slug = models.SlugField()
     description = models.CharField(max_length=255)
     discount = models.FloatField(
         validators=[MinValueValidator(1), MaxValueValidator(99)])

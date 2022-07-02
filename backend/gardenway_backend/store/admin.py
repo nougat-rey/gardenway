@@ -142,10 +142,13 @@ class PromotionFilter(admin.SimpleListFilter):
 
 @admin.register(models.Promotion)
 class PromotionAdmin(admin.ModelAdmin):
-    list_display = ['description', 'discount']
+    list_display = ['title', 'description', 'discount']
     list_per_page = 10
     list_filter = [PromotionFilter]
-    search_fields = ['description']
+    search_fields = ['title', 'description']
+    prepopulated_fields = {
+        'slug': ['title']
+    }
 
 
 class OrderItemInline(admin.TabularInline):
