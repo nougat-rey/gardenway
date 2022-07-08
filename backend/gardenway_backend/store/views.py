@@ -79,7 +79,7 @@ class CartViewSet(ModelViewSet):
         if self.action == 'list' or self.action == 'destroy':
             return [IsAdminUser()]
         elif self.action == 'create':
-            return [IsAuthenticated()]
+            return [IsAdminOrOwner()]
         elif self.action == 'retrieve':
             return [IsAdminOrOwner()]
         return [IsAdminUser()]
@@ -115,7 +115,7 @@ class OrderViewSet(ModelViewSet):
         if self.action == 'list' or self.action == 'destroy':
             return [IsAdminUser()]
         elif self.action == 'create':
-            return [IsAuthenticated]
+            return [IsAuthenticated()]
         elif self.action == 'retrieve':
             return [IsAdminOrOwner()]
         return [IsAdminUser()]
