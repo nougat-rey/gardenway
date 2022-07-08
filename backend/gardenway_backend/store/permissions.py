@@ -13,6 +13,7 @@ class IsAdminOrReadOnly(permissions.BasePermission):
 
 class IsAdminOrOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
+        print(request)
         if request.user.is_staff:
             return True
         elif request.method in ['OPTIONS', 'HEAD']:
@@ -20,6 +21,9 @@ class IsAdminOrOwner(permissions.BasePermission):
         elif request.method == 'GET':
             if type(obj) is Cart:
                 return (request.user.id == CartSerializer(obj).data['customer'])
-            if type(obj) is Order:
+            elif type(obj) is Order:
                 return (request.user.id == OrderSerializer(obj).data['customer'])
+        elif request.method == 'POST':
+            # TODO incomplete, act as IsAuthenticated for now
+            return bool(request.user)
         return False
