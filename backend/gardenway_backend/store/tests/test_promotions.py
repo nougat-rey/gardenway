@@ -63,3 +63,19 @@ class TestCreatePromotion:
         response = client.post(
             self.url, self.get_invalid_data("discount", 100))
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+class TestListPromotions:
+    url = '/store/promotions/'
+
+    def test_returns_200(self):
+
+        # Arrange
+        client = APIClient()
+
+        # Act
+        response = client.get(self.url)
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK

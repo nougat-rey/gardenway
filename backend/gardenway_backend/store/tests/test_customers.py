@@ -79,3 +79,32 @@ class TestCreateCustomer:
         response4 = client.post(
             self.url, {"user_id": user.id, "phone": "acb"})
         assert response4.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+class TestListCustomers:
+    url = '/store/customers/'
+
+    def test_returns_200(self):
+
+        # Arrange
+        client = APIClient()
+        client.force_authenticate(user=User(is_staff=True))
+
+        # Act
+        response = client.get(self.url)
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_returns_403_from_non_admin(self):
+
+        # Arrange
+        client = APIClient()
+        client.force_authenticate(user=User(is_staff=False))
+
+        # Act
+        response = client.get(self.url)
+
+        # Assert
+        assert response.status_code == status.HTTP_403_FORBIDDEN

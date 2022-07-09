@@ -67,3 +67,19 @@ class TestCreateProduct:
         response = client.post(
             self.url, self.get_invalid_data("inventory", -1))
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+class TestListProducts:
+    url = '/store/products/'
+
+    def test_returns_200(self):
+
+        # Arrange
+        client = APIClient()
+
+        # Act
+        response = client.get(self.url)
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
