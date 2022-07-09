@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.test import APIClient
-from store.models import User
+from store.models import User, Product
+from model_bakery import baker
 import pytest
 
 
@@ -67,3 +68,45 @@ class TestCreateProduct:
         response = client.post(
             self.url, self.get_invalid_data("inventory", -1))
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+class TestListProducts:
+    url = '/store/products/'
+
+    def test_returns_200(self):
+
+        # Arrange
+        client = APIClient()
+
+        # Act
+        response = client.get(self.url)
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+class TestGetProduct:
+
+    def test_returns_200(self):
+
+        # Arrange
+        client = APIClient()
+        product = baker.make(Product)
+
+        # Act
+        response = client.get(f'/store/products/{product.id}/')
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_returns_404(self):
+        # Arrange
+        client = APIClient()
+
+        # Act
+        response = client.get(f'/store/products/500/')
+
+        # Assert
+        assert response.status_code == status.HTTP_404_NOT_FOUND

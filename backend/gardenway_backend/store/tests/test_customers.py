@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.test import APIClient
-from store.models import User
+from store.models import User, Customer
 from model_bakery import baker
 import pytest
 
@@ -16,8 +16,6 @@ class TestCreateCustomer:
         client = APIClient()
         user = baker.make(User, is_staff=True)
         client.force_authenticate(user)
-        print("Testing!!!")
-        print(user)
         # Act
         response = client.post(self.url, {"user_id": user.id})
 
@@ -81,3 +79,72 @@ class TestCreateCustomer:
         response4 = client.post(
             self.url, {"user_id": user.id, "phone": "acb"})
         assert response4.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+class TestListCustomers:
+    url = '/store/customers/'
+
+    def test_returns_200(self):
+
+        # Arrange
+        client = APIClient()
+        client.force_authenticate(user=User(is_staff=True))
+
+        # Act
+        response = client.get(self.url)
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_returns_403_from_non_admin(self):
+
+        # Arrange
+        client = APIClient()
+        client.force_authenticate(user=User(is_staff=False))
+
+        # Act
+        response = client.get(self.url)
+
+        # Assert
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
+class TestGetCustomer:
+
+    def test_returns_200(self):
+
+        # Arrange
+        client = APIClient()
+        client.force_authenticate(user=User(is_staff=True))
+        customer = baker.make(Customer)
+
+        # Act
+        response = client.get(f'/store/customers/{customer.id}/')
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_returns_403_from_non_admin(self):
+        # Arrange
+        client = APIClient()
+        client.force_authenticate(user=User(is_staff=False))
+        customer = baker.make(Customer)
+
+        # Act
+        response = client.get(f'/store/customers/{customer.id}/')
+
+        # Assert
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_returns_404(self):
+        # Arrange
+        client = APIClient()
+        client.force_authenticate(user=User(is_staff=True))
+
+        # Act
+        response = client.get(f'/store/customers/500/')
+
+        # Assert
+        assert response.status_code == status.HTTP_404_NOT_FOUND

@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.test import APIClient
-from store.models import User
+from store.models import User, Promotion
+from model_bakery import baker
 import pytest
 
 
@@ -63,3 +64,45 @@ class TestCreatePromotion:
         response = client.post(
             self.url, self.get_invalid_data("discount", 100))
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+class TestListPromotions:
+    url = '/store/promotions/'
+
+    def test_returns_200(self):
+
+        # Arrange
+        client = APIClient()
+
+        # Act
+        response = client.get(self.url)
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+class TestGetPromotion:
+
+    def test_returns_200(self):
+
+        # Arrange
+        client = APIClient()
+        promotion = baker.make(Promotion)
+
+        # Act
+        response = client.get(f'/store/promotions/{promotion.id}/')
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_returns_404(self):
+        # Arrange
+        client = APIClient()
+
+        # Act
+        response = client.get(f'/store/promotions/500/')
+
+        # Assert
+        assert response.status_code == status.HTTP_404_NOT_FOUND
