@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.db.models.aggregates import Count
 from rest_framework import status
 from rest_framework.response import Response
@@ -79,7 +80,7 @@ class CartViewSet(ModelViewSet):
         if self.action == 'list' or self.action == 'destroy':
             return [IsAdminUser()]
         elif self.action == 'create':
-            return [IsAdminOrOwner()]
+            return [IsAuthenticated()]
         elif self.action == 'retrieve':
             return [IsAdminOrOwner()]
         return [IsAdminUser()]
@@ -95,7 +96,6 @@ class CartItemViewSet(ModelViewSet):
             return AddCartItemSerializer
         elif self.request.method == 'PATCH':
             return UpdateCartItemSerializer
-
         return CartItemSerializer
 
     def get_serializer_context(self):
@@ -135,7 +135,8 @@ class OrderViewSet(ModelViewSet):
             order = serializer.save()
 
             serializer = OrderSerializer(order)
-            response = Response(serializer.data)
+            response = Response(
+                serializer.data, status=status.HTTP_201_CREATED)
         else:
             # anonymous user does not have a user id to add to the request
             response = Response({'error': 'Anonymous user cannot create an order.'},
@@ -147,6 +148,20 @@ class CustomerViewSet(ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
     permission_classes = [IsAdminUser]
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = CustomerSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            response = Response(
+                serializer.data, status=status.HTTP_201_CREATED)
+        except IntegrityError:
+            response = Response(
+                {'error': f'Cannot create customer for user {request.data["user_id"]} - either associated user is already connected to a customer or associated user does not exist'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return response
 
     @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
     def me(self, request):
