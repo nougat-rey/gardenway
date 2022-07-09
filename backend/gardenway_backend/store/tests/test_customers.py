@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.test import APIClient
-from store.models import User
+from store.models import User, Customer
 from model_bakery import baker
 import pytest
 
@@ -108,3 +108,43 @@ class TestListCustomers:
 
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
+class TestGetCustomer:
+
+    def test_returns_200(self):
+
+        # Arrange
+        client = APIClient()
+        client.force_authenticate(user=User(is_staff=True))
+        customer = baker.make(Customer)
+
+        # Act
+        response = client.get(f'/store/customers/{customer.id}/')
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_returns_403_from_non_admin(self):
+        # Arrange
+        client = APIClient()
+        client.force_authenticate(user=User(is_staff=False))
+        customer = baker.make(Customer)
+
+        # Act
+        response = client.get(f'/store/customers/{customer.id}/')
+
+        # Assert
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_returns_404(self):
+        # Arrange
+        client = APIClient()
+        client.force_authenticate(user=User(is_staff=True))
+
+        # Act
+        response = client.get(f'/store/customers/500/')
+
+        # Assert
+        assert response.status_code == status.HTTP_404_NOT_FOUND
