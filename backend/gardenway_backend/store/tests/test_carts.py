@@ -42,7 +42,6 @@ class TestCreateCart:
 
         # Act
         response = client.post(self.url, {"customer": customer.id})
-        print(response.data)
 
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -57,3 +56,32 @@ class TestCreateCart:
         # 1. customer does not exist
         response = client.post(self.url, {"customer": 999})
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+class TestListCarts:
+    url = '/store/carts/'
+
+    def test_returns_201(self):
+
+        # Arrange
+        client = APIClient()
+        client.force_authenticate(user=User(is_staff=True))
+
+        # Act
+        response = client.get(self.url)
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_returns_403_from_non_admin(self):
+
+        # Arrange
+        client = APIClient()
+        client.force_authenticate(user=User(is_staff=False))
+
+        # Act
+        response = client.get(self.url)
+
+        # Assert
+        assert response.status_code == status.HTTP_403_FORBIDDEN

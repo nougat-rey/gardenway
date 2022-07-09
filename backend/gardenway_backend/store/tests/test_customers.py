@@ -16,8 +16,6 @@ class TestCreateCustomer:
         client = APIClient()
         user = baker.make(User, is_staff=True)
         client.force_authenticate(user)
-        print("Testing!!!")
-        print(user)
         # Act
         response = client.post(self.url, {"user_id": user.id})
 
