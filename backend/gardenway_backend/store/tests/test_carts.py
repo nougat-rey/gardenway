@@ -62,7 +62,7 @@ class TestCreateCart:
 class TestListCarts:
     url = '/store/carts/'
 
-    def test_returns_201(self):
+    def test_returns_200(self):
 
         # Arrange
         client = APIClient()
