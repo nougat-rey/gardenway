@@ -20,11 +20,6 @@ class TestCreateCart:
 
     url = '/store/carts/'
 
-    def get_valid_data(self):
-        return {
-            "customer": 1
-        }
-
     def test_returns_201(self):
 
         # Arrange
@@ -33,18 +28,21 @@ class TestCreateCart:
         customer = baker.make(Customer)
 
         # Act
-        response = client.post(self.url, self.get_valid_data())
+        response = client.post(self.url, {"customer": customer.id})
 
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
         assert is_valid_uuid(response.data['id'])
 
     def test_returns_403_from_anonymous(self):
+
         # Arrange
         client = APIClient()
+        customer = baker.make(Customer)
 
         # Act
-        response = client.post(self.url, self.get_valid_data())
+        response = client.post(self.url, {"customer": customer.id})
+        print(response.data)
 
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN

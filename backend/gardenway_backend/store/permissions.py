@@ -23,7 +23,4 @@ class IsAdminOrOwner(permissions.BasePermission):
                 return (request.user.id == CartSerializer(obj).data['customer'])
             elif type(obj) is Order:
                 return (request.user.id == OrderSerializer(obj).data['customer'])
-        elif request.method == 'POST':
-            # TODO incomplete, act as IsAuthenticated for now
-            return bool(request.user)
         return False
