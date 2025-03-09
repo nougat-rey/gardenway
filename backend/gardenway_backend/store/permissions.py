@@ -19,7 +19,7 @@ class IsAdminOrOwner(permissions.BasePermission):
             return True
         elif request.method == 'GET':
             if type(obj) is Cart:
-                return (request.user.id == CartSerializer(obj).data['customer'])
+                return (request.user.id == obj.customer.user.id)
             elif type(obj) is Order:
-                return (request.user.id == OrderSerializer(obj).data['customer'])
+                return (request.user.id == obj.customer.user.id)
         return False

@@ -104,7 +104,7 @@ class TestGetCart:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
-    @pytest.mark.skip(reason="Owner permission not yet implemented")
+    # @pytest.mark.skip(reason="Owner permission not yet implemented")
     def test_returns_200_for_owner(self):
 
         # Arrange
@@ -116,7 +116,6 @@ class TestGetCart:
 
         # Act
         response = client.get(f'/store/carts/{cart.id}/')
-
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
