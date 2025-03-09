@@ -72,7 +72,6 @@ class ProductReviewViewSet(ModelViewSet):
 class CartViewSet(ModelViewSet):
     queryset = Cart.objects.prefetch_related('items__product').all()
     serializer_class = CartSerializer
-    permission_classes = [IsAuthenticated]
     filterset_class = CartFilter
     ordering_fields = ['created_at']
 
