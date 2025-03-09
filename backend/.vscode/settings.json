@@ -1,4 +1,5 @@
 {
+  "python.pythonPath": "/Users/geoffreynguyen/.local/share/virtualenvs/gardenway-h8KF1WZl",
   "python.testing.pytestArgs": [
     "gardenway_backend"
   ],
