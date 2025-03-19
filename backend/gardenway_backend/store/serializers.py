@@ -2,7 +2,7 @@ from rest_framework import serializers
 from decimal import Decimal
 from .models import *
 from djoser.serializers import UserSerializer as BaseUserSerializer, UserCreateSerializer as BaseUserCreateSerializer
-
+from django.db import transaction
 TAX = 1.13
 
 
@@ -189,8 +189,22 @@ class CreateOrderSerializer(serializers.Serializer):
     def save(self, **kwargs):
         (customer, created) = Customer.objects.get_or_create(
             id=self.context['user_id'])
-        return Order.objects.create(customer=customer)
-
+        with transaction.atomic():
+            cart_id = self.validated_data['cart_id']
+            order = Order.objects.create(customer=customer)
+            cart_items = CartItem.objects.select_related('product').filter(cart_id=cart_id)
+            order_items = [
+    							OrderItem(
+    								order=order,
+    								product=item.product,
+    								unit_price=item.product.unit_price,
+    								quantity=item.quantity
+    							) for item in cart_items
+    			]
+            OrderItem.objects.bulk_create(order_items) 
+            Cart.objects.filter(pk=cart_id).delete()
+        return order
+    
     def validate_cart_id(self, cart_id):
         if not Cart.objects.filter(pk=cart_id).exists():
             raise serializers.ValidationError(
