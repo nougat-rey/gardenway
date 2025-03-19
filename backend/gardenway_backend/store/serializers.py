@@ -190,22 +190,23 @@ class CreateOrderSerializer(serializers.Serializer):
 
     def save(self, **kwargs):
         with transaction.atomic():
-            (customer, created) = Customer.objects.get_or_create(
-            id=self.context['user_id'])
+            customer = Customer.objects.select_for_update().filter(user_id=self.context['user_id']).first()
+            if not customer:
+                customer = Customer.objects.create(user_id=self.context['user_id'])
             cart_id = self.validated_data['cart_id']
             order = Order.objects.create(customer=customer)
             cart_items = CartItem.objects.select_related('product').filter(cart_id=cart_id)
             order_items = [
-    							OrderItem(
-    								order=order,
-    								product=item.product,
-    								unit_price=item.product.unit_price,
-    								quantity=item.quantity
-    							) for item in cart_items
-    			]
+                                OrderItem(
+                                    order=order,
+                                    product=item.product,
+                                    unit_price=item.product.unit_price,
+                                    quantity=item.quantity
+                                ) for item in cart_items
+                ]
             OrderItem.objects.bulk_create(order_items) 
             Cart.objects.filter(pk=cart_id).delete()
-            order_created.send_robust(self.__class__, order-order)
+            order_created.send_robust(self.__class__, order=order)
         return order
     
     def validate_cart_id(self, cart_id):
