@@ -3,7 +3,7 @@ from decimal import Decimal
 from .models import *
 from djoser.serializers import UserSerializer as BaseUserSerializer, UserCreateSerializer as BaseUserCreateSerializer
 from django.db import transaction
-from signals import order_created
+from .signals import order_created
 
 TAX = 1.13
 
