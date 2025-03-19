@@ -3,6 +3,8 @@ from decimal import Decimal
 from .models import *
 from djoser.serializers import UserSerializer as BaseUserSerializer, UserCreateSerializer as BaseUserCreateSerializer
 from django.db import transaction
+from signals import order_created
+
 TAX = 1.13
 
 
@@ -187,9 +189,9 @@ class CreateOrderSerializer(serializers.Serializer):
     cart_id = serializers.UUIDField()
 
     def save(self, **kwargs):
-        (customer, created) = Customer.objects.get_or_create(
-            id=self.context['user_id'])
         with transaction.atomic():
+            (customer, created) = Customer.objects.get_or_create(
+            id=self.context['user_id'])
             cart_id = self.validated_data['cart_id']
             order = Order.objects.create(customer=customer)
             cart_items = CartItem.objects.select_related('product').filter(cart_id=cart_id)
@@ -203,6 +205,7 @@ class CreateOrderSerializer(serializers.Serializer):
     			]
             OrderItem.objects.bulk_create(order_items) 
             Cart.objects.filter(pk=cart_id).delete()
+            order_created.send_robust(self.__class__, order-order)
         return order
     
     def validate_cart_id(self, cart_id):
