@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'silk',
     'djoser',
-    'django_filters'
+    'django_filters',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -57,6 +58,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
+
+# TODO Add Frontend app to Middleware?
 
 # if DEBUG:
 #    MIDDLEWARE.append('silk.middleware.SilkyMiddleware')
@@ -99,6 +102,11 @@ DATABASES = {
 INTERNAL_IPS = [
     '127.0.0.1'
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8001',
+    'http://127.0.0.1.8001'
+    ]
 
 REST_FRAMEWORK = {
     'COERCE_DECIMAL_TO_STRING': False,
