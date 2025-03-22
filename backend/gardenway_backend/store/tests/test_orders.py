@@ -45,7 +45,6 @@ class TestCreateOrder:
         assert post_cart_item_response.data['product_id'] == response.data['items'][0]['product']['id']
         assert post_cart_item_response.data['quantity'] == response.data['items'][0]['quantity'] 
 
-        
     def test_returns_403_from_anonymous(self):
         
         # Arrange
@@ -69,20 +68,7 @@ class TestCreateOrder:
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_returns_400_from_invalid_data(self):
-        
-        # Arrange
-        client = APIClient()
-        user = baker.make(User, is_staff=False)
-        client.force_authenticate(user)
-
-        # Arrange, Act & Assert
-        # 1. cart that does not exist
-        case1_response = client.post(self.url, {"cart_id": 999})
-        assert case1_response.status_code == status.HTTP_400_BAD_REQUEST
-
-    @pytest.mark.skip(reason="Known failure")
-    def test_returns_400_from_cart_not_belong_to_user(self):
+    def test_returns_403_from_cart_not_belong_to_user(self):
         
         #  Arrange
         client = APIClient()
@@ -104,9 +90,20 @@ class TestCreateOrder:
         client.force_login(other_user)
         response = client.post(self.url, {"cart_id": str(cart_id)}, format='json')
         
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_returns_400_from_empty_cart(self):
+    def test_returns_403_from_invalid_data(self):
+        
+        # Arrange
+        client = APIClient()
+        user = baker.make(User, is_staff=False)
+        client.force_authenticate(user)
+
+        # Arrange, Act & Assert
+        response = client.post(self.url, {"cart_id": "Hello World!"})
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_returns_403_from_empty_cart(self):
         
         # Arrange
         client = APIClient()
@@ -121,7 +118,7 @@ class TestCreateOrder:
         response = client.post(self.url, {"cart_id": str(cart_id)}, format='json')
         
         # Assert
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
 @pytest.mark.django_db
 class TestListOrders:
