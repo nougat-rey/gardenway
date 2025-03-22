@@ -1,7 +1,7 @@
 from re import T
 from rest_framework import permissions
 from .serializers import OrderSerializer, CartSerializer
-from .models import Order, Cart
+from .models import Customer, Order, Cart
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
@@ -18,7 +18,9 @@ class IsAdminOrOwner(permissions.BasePermission):
         elif request.method in ['OPTIONS', 'HEAD']:
             return True
         elif request.method == 'GET':
-            if type(obj) is Cart:
+            if type(obj) is Customer:
+                return(request.user.id == obj.id)
+            elif type(obj) is Cart:
                 return (request.user.id == obj.customer.user.id)
             elif type(obj) is Order:
                 return (request.user.id == obj.customer.user.id)

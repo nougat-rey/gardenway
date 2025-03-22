@@ -124,6 +124,7 @@ class TestGetCustomer:
         print(response)
         # Assert
         assert response.status_code == status.HTTP_200_OK
+        assert response.data['id'] > 0
 
     def test_returns_403_from_non_admin(self):
         # Arrange
@@ -136,7 +137,7 @@ class TestGetCustomer:
 
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
-
+        
     def test_returns_404_client_does_not_exist(self):
         # Arrange
         client = APIClient()

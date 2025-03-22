@@ -22,6 +22,9 @@ class TestCreateOrder:
 
     def setup_cart(self, user):
         customer = baker.make(Customer, user_id=user.id, phone="1234567890")
+        print("****************************************")
+        print(user.id)
+        print("****************************************") 
         cartitem = baker.make(CartItem)
         cart = baker.make(Cart, items=[cartitem], customer=customer)
         return cart
@@ -43,6 +46,9 @@ class TestCreateOrder:
         # Arrange
         client = APIClient()
         user = baker.make(User, is_staff=False)
+        print("****************************************")
+        print(user.id)
+        print("****************************************")
         client.force_authenticate(user)
         cart = self.setup_cart(user)
         # Act

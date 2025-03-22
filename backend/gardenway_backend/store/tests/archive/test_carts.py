@@ -14,7 +14,6 @@ def is_valid_uuid(input):
     except ValueError:
         return False
 
-
 @pytest.mark.django_db
 class TestCreateCart:
 
@@ -24,11 +23,12 @@ class TestCreateCart:
 
         # Arrange
         client = APIClient()
-        client.force_authenticate(user=User(is_staff=True))
-        customer = baker.make(Customer)
+        user = baker.make(User, is_staff=True)
+        client.force_authenticate(user)
 
         # Act
-        response = client.post(self.url, {"customer": customer.id})
+        get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id})
+        response = client.post(self.url, {"customer": get_customer_response.data['id']})
 
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
@@ -38,10 +38,14 @@ class TestCreateCart:
 
         # Arrange
         client = APIClient()
-        customer = baker.make(Customer)
+        user = baker.make(User, is_staff=True)
+        client.force_authenticate(user)
+        get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id}) 
+        customer_id = get_customer_response.data['id'] 
+        client.logout()
 
         # Act
-        response = client.post(self.url, {"customer": customer.id})
+        response = client.post(self.url, {"customer": customer_id})
 
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -95,27 +99,30 @@ class TestGetCart:
         # Arrange
         client = APIClient()
         user = baker.make(User, is_staff=True)
-        cart = baker.make(Cart)
         client.force_authenticate(user)
+        get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id})
+        create_cart_response = client.post(f'/store/carts/', {"customer": get_customer_response.data['id']})
+        cart_id = create_cart_response.data['id']
 
         # Act
-        response = client.get(f'/store/carts/{cart.id}/')
+        response = client.get(f'/store/carts/{cart_id}/')
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
-    # @pytest.mark.skip(reason="Owner permission not yet implemented")
     def test_returns_200_for_owner(self):
 
         # Arrange
         client = APIClient()
         user = baker.make(User, is_staff=False)
-        customer = baker.make(Customer, user_id=user.id)
-        cart = baker.make(Cart, customer=customer)
         client.force_authenticate(user)
+        get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id})
+        create_cart_response = client.post(f'/store/carts/', {"customer": get_customer_response.data['id']})
+        cart_id = create_cart_response.data['id'] 
 
         # Act
-        response = client.get(f'/store/carts/{cart.id}/')
+        response = client.get(f'/store/carts/{cart_id}/')
+
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
@@ -124,11 +131,17 @@ class TestGetCart:
         # Arrange
         client = APIClient()
         user = baker.make(User, is_staff=False)
-        cart = baker.make(Cart)
         client.force_authenticate(user)
+        get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id})
+        create_cart_response = client.post(f'/store/carts/', {"customer": get_customer_response.data['id']})
+        cart_id = create_cart_response.data['id'] 
+        client.logout()
+        
+        other_user = baker.make(User, is_staff=False) 
+        client.force_authenticate(other_user)
 
         # Act
-        response = client.get(f'/store/carts/{cart.id}/')
+        response = client.get(f'/store/carts/{cart_id}/')
 
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -143,3 +156,6 @@ class TestGetCart:
 
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+

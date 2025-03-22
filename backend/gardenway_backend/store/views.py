@@ -162,7 +162,7 @@ class CustomerViewSet(ModelViewSet):
             )
         return response
 
-    @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAdminUser])
+    @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAdminOrOwner])
     def me(self, request):
         (customer, created) = Customer.objects.get_or_create(
             user_id=request.user.id)
