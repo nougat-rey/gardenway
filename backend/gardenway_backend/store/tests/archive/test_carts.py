@@ -23,7 +23,7 @@ class TestCreateCart:
 
         # Arrange
         client = APIClient()
-        user = baker.make(User, is_staff=True)
+        user = baker.make(User, is_staff=False)
         client.force_authenticate(user)
 
         # Act
@@ -32,7 +32,7 @@ class TestCreateCart:
 
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
-        assert is_valid_uuid(response.data['id'])
+        assert is_valid_uuid(response.data['id'])   
 
     def test_returns_403_from_anonymous(self):
 
