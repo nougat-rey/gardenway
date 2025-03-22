@@ -3,3 +3,4 @@ dev.py
 __pycache__/
 media/
 static/
+general.log

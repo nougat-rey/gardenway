@@ -10,6 +10,8 @@ from .permissions import IsAdminOrReadOnly, IsAdminOrOwner
 from .models import *
 from .serializers import *
 from .filters import *
+import logging
+logger = logging.getLogger(__name__)
 
 
 class ProductViewSet(ModelViewSet):
@@ -157,6 +159,8 @@ class OrderViewSet(ModelViewSet):
                 )
 
             # Check if the cart belongs to the authenticated user
+            logger.info(f"Requesting user: {self.request.user}")
+            logger.info(f"Owner of cart: {cart.customer.user}")
             if cart.customer.user != request.user:
                 return Response(
                     {'error': 'You can only create orders for your own cart.'},

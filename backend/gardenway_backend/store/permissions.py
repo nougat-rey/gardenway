@@ -3,7 +3,6 @@ from rest_framework import permissions
 from .serializers import OrderSerializer, CartSerializer
 from .models import Customer, Order, Cart
 
-
 class IsAdminOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:  # GET, HEAD, OPTIONS
