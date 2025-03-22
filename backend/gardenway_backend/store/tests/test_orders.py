@@ -42,59 +42,86 @@ class TestCreateOrder:
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
         assert is_valid_uuid(response.data['id'])
+        assert post_cart_item_response.data['product_id'] == response.data['items'][0]['product']['id']
+        assert post_cart_item_response.data['quantity'] == response.data['items'][0]['quantity'] 
+
         
     def test_returns_403_from_anonymous(self):
+        
         # Arrange
         client = APIClient()
         user = baker.make(User, is_staff=False)
-        client.force_authenticate(user=None)
-        cart = self.setup_cart(user)
+        product = baker.make(Product)
+        client.force_authenticate(user)
 
         # Act
-        response = client.post(self.url, {"cart_id": cart.id})
-
+        get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id})
+        post_cart_response = client.post(f'/store/carts/', {"customer": get_customer_response.data['id']})
+        cart_id = post_cart_response.data['id']
+        data = {
+            "product_id": product.id,
+            "quantity": 5
+        }
+        post_cart_item_response = client.post(f'/store/carts/{cart_id}/items/', data)
+        client.logout()
+        response = client.post(self.url, {"cart_id": str(cart_id)}, format='json')
+        
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_returns_400_from_invalid_data(self):
-        # Basic Arrange
+        
+        # Arrange
         client = APIClient()
         user = baker.make(User, is_staff=False)
         client.force_authenticate(user)
 
         # Arrange, Act & Assert
-
         # 1. cart that does not exist
         case1_response = client.post(self.url, {"cart_id": 999})
         assert case1_response.status_code == status.HTTP_400_BAD_REQUEST
 
-    @pytest.mark.skip(reason="Cart own permissions not implemented")
+    @pytest.mark.skip(reason="Known failure")
     def test_returns_400_from_cart_not_belong_to_user(self):
-        # Basic Arrange
+        
+        #  Arrange
         client = APIClient()
         user = baker.make(User, is_staff=False)
+        product = baker.make(Product)
         client.force_authenticate(user)
 
-        # Arrange, Act & Assert
-
-        # 2. cart that does not belong to current user
-        # TODO incomplete, skip for now
-        case2_cart = self.setup_not_owned_cart()
-        case2_response = client.post(self.url, {"cart_id": case2_cart.id})
-        assert case2_response.status_code == status.HTTP_400_BAD_REQUEST
+        # Act
+        get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id})
+        post_cart_response = client.post(f'/store/carts/', {"customer": get_customer_response.data['id']})
+        cart_id = post_cart_response.data['id']
+        data = {
+            "product_id": product.id,
+            "quantity": 5
+        }
+        post_cart_item_response = client.post(f'/store/carts/{cart_id}/items/', data)
+        client.logout()
+        other_user = baker.make(User, is_staff=False)
+        client.force_login(other_user)
+        response = client.post(self.url, {"cart_id": str(cart_id)}, format='json')
+        
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_returns_400_from_empty_cart(self):
-        # Basic Arrange
+        
+        # Arrange
         client = APIClient()
         user = baker.make(User, is_staff=False)
+        product = baker.make(Product)
         client.force_authenticate(user)
 
-        # Arrange, Act & Assert
-        # 3. empty cart
-        case3_cart = self.setup_empty_cart(user)
-        case3_response = client.post(self.url, {"cart_id": case3_cart.id})
-        assert case3_response.status_code == status.HTTP_400_BAD_REQUEST
-
+        # Act
+        get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id})
+        post_cart_response = client.post(f'/store/carts/', {"customer": get_customer_response.data['id']})
+        cart_id = post_cart_response.data['id']
+        response = client.post(self.url, {"cart_id": str(cart_id)}, format='json')
+        
+        # Assert
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 @pytest.mark.django_db
 class TestListOrders:
@@ -133,27 +160,45 @@ class TestGetOrder:
         # Arrange
         client = APIClient()
         user = baker.make(User, is_staff=True)
-        order = baker.make(Order)
+        product = baker.make(Product)
         client.force_authenticate(user)
+        get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id})
+        post_cart_response = client.post(f'/store/carts/', {"customer": get_customer_response.data['id']})
+        cart_id = post_cart_response.data['id']
+        data = {
+            "product_id": product.id,
+            "quantity": 5
+        }
+        post_cart_item_response = client.post(f'/store/carts/{cart_id}/items/', data)
+        post_order_response = client.post(f'/store/orders/', {"cart_id": str(cart_id)}, format='json')
+        order_id = post_order_response.data['id']        
 
         # Act
-        response = client.get(f'/store/orders/{order.id}/')
+        response = client.get(f'/store/orders/{order_id}/')
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
-    @pytest.mark.skip(reason="Owner permission not yet implemented")
     def test_returns_200_for_owner(self):
 
         # Arrange
         client = APIClient()
         user = baker.make(User, is_staff=False)
-        customer = baker.make(Customer, user_id=user.id)
-        order = baker.make(Order, customer=customer)
+        product = baker.make(Product)
         client.force_authenticate(user)
+        get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id})
+        post_cart_response = client.post(f'/store/carts/', {"customer": get_customer_response.data['id']})
+        cart_id = post_cart_response.data['id']
+        data = {
+            "product_id": product.id,
+            "quantity": 5
+        }
+        post_cart_item_response = client.post(f'/store/carts/{cart_id}/items/', data)
+        post_order_response = client.post(f'/store/orders/', {"cart_id": str(cart_id)}, format='json')
+        order_id = post_order_response.data['id']        
 
         # Act
-        response = client.get(f'/store/orders/{order.id}/')
+        response = client.get(f'/store/orders/{order_id}/')
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
@@ -163,14 +208,28 @@ class TestGetOrder:
         # Arrange
         client = APIClient()
         user = baker.make(User, is_staff=False)
-        order = baker.make(Order)
+        product = baker.make(Product)
         client.force_authenticate(user)
+        get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id})
+        post_cart_response = client.post(f'/store/carts/', {"customer": get_customer_response.data['id']})
+        cart_id = post_cart_response.data['id']
+        data = {
+            "product_id": product.id,
+            "quantity": 5
+        }
+        post_cart_item_response = client.post(f'/store/carts/{cart_id}/items/', data)
+        post_order_response = client.post(f'/store/orders/', {"cart_id": str(cart_id)}, format='json')
+        order_id = post_order_response.data['id']
+        client.logout()
+        other_user = baker.make(User, is_staff=False) 
+        client.force_authenticate(other_user)        
 
         # Act
-        response = client.get(f'/store/orders/{order.id}/')
+        response = client.get(f'/store/orders/{order_id}/')
 
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
+        
 
     def test_returns_404(self):
         # Arrange
