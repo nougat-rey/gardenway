@@ -4,6 +4,7 @@ from .models import *
 from djoser.serializers import UserSerializer as BaseUserSerializer, UserCreateSerializer as BaseUserCreateSerializer
 from django.db import transaction
 from .signals import order_created
+from uuid import UUID
 
 TAX = 1.13
 
@@ -209,6 +210,10 @@ class CreateOrderSerializer(serializers.Serializer):
         return order
     
     def validate_cart_id(self, cart_id):
+        try:
+            valid_uuid = UUID(str(cart_id))
+        except ValueError:
+            raise serializers.ValidationError(f"{str(cart_id)} is not a valid UUID.")
         if not Cart.objects.filter(pk=cart_id).exists():
             raise serializers.ValidationError(
                 'No cart with the given ID was found')
