@@ -126,7 +126,7 @@ class TestGetCustomer:
         assert response.status_code == status.HTTP_200_OK
         assert response.data['id'] > 0
 
-    def test_returns_403_from_non_admin(self):
+    def test_returns_200_from_self(self):
         # Arrange
         client = APIClient()
         user = baker.make(User, is_staff=False)
@@ -136,7 +136,7 @@ class TestGetCustomer:
         response = client.get(f'/store/customers/me/', {"user_id":user.id})
 
         # Assert
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_200_OK
         
     def test_returns_404_client_does_not_exist(self):
         # Arrange
