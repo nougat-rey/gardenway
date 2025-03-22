@@ -69,7 +69,6 @@ class TestCreateProductImage:
 
 @pytest.mark.django_db
 class TestListProductImages:
-    url = '/store/products/'
 
     def test_returns_200(self):
 
@@ -86,7 +85,7 @@ class TestListProductImages:
 
 
 @pytest.mark.django_db
-class TestGetProductImages:
+class TestGetProductImage:
 
     def test_returns_200(self):
 
