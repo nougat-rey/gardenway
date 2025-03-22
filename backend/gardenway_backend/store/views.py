@@ -1,6 +1,7 @@
 from django.db import IntegrityError
 from django.db.models.aggregates import Count
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
@@ -128,9 +129,34 @@ class OrderViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         if self.request.user.id:
+
             serializer = CreateOrderSerializer(data=request.data, context={
                 'user_id': self.request.user.id})
-            serializer.is_valid(raise_exception=True)
+            try:
+                serializer.is_valid(raise_exception=True)
+            
+            except ValidationError as e:
+                return Response(
+                    {'error': 'Invalid Cart ID, Cart not found or Cart is empty.'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            try:
+                # Retrieve the Cart object
+                cart = Cart.objects.get(id=request.data['cart_id'])
+            except Cart.DoesNotExist:
+                return Response(
+                    {'error': 'Cart not found.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            # Check if the cart belongs to the authenticated user
+            if cart.customer.user != request.user:
+                return Response(
+                    {'error': 'You can only create orders for your own cart.'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
             order = serializer.save()
 
             serializer = OrderSerializer(order)
