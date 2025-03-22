@@ -2,10 +2,10 @@ from rest_framework import status
 from rest_framework.test import APIClient
 from store.models import User
 import pytest
-from store.models import Cart, CartItem, Customer, Order
+from store.models import Product, Customer, Order
 from model_bakery import baker
 import uuid
-
+from uuid import uuid4
 
 def is_valid_uuid(input):
     try:
@@ -20,44 +20,29 @@ class TestCreateOrder:
 
     url = '/store/orders/'
 
-    def setup_cart(self, user):
-        customer = baker.make(Customer, user_id=user.id, phone="1234567890")
-        print("****************************************")
-        print(user.id)
-        print("****************************************") 
-        cartitem = baker.make(CartItem)
-        cart = baker.make(Cart, items=[cartitem], customer=customer)
-        return cart
-
-    def setup_not_owned_cart(self):
-        user = baker.make(User, is_staff=False)
-        customer = baker.make(Customer, user_id=user.id, phone="0987654321")
-        cartitem = baker.make(CartItem)
-        cart = baker.make(Cart, items=[cartitem], customer=customer)
-        return cart
-
-    def setup_empty_cart(self, user):
-        customer = baker.make(Customer, user_id=user.id, phone="1234567890")
-        cart = baker.make(Cart, customer=customer)
-        return cart
-
     def test_returns_201(self):
 
         # Arrange
         client = APIClient()
         user = baker.make(User, is_staff=False)
-        print("****************************************")
-        print(user.id)
-        print("****************************************")
+        product = baker.make(Product)
         client.force_authenticate(user)
-        cart = self.setup_cart(user)
-        # Act
-        response = client.post(self.url, {"cart_id": cart.id})
 
+        # Act
+        get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id})
+        post_cart_response = client.post(f'/store/carts/', {"customer": get_customer_response.data['id']})
+        cart_id = post_cart_response.data['id']
+        data = {
+            "product_id": product.id,
+            "quantity": 5
+        }
+        post_cart_item_response = client.post(f'/store/carts/{cart_id}/items/', data)
+        response = client.post(self.url, {"cart_id": str(cart_id)}, format='json')
+        
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
         assert is_valid_uuid(response.data['id'])
-
+        
     def test_returns_403_from_anonymous(self):
         # Arrange
         client = APIClient()

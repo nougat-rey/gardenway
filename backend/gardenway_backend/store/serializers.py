@@ -69,7 +69,6 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'slug',
                   'inventory', 'price', 'price_with_tax', 'images', 'reviews']
 
-
 class CollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Collection
@@ -164,7 +163,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'quantity',
+        fields = ['id', 'product', 'unit_price', 'quantity',
                   'total_price', 'total_price_with_tax']
 
 
