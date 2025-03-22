@@ -1,7 +1,6 @@
-from psutil import users
 from rest_framework import status
 from rest_framework.test import APIClient
-from store.models import User, Customer, Cart
+from store.models import User
 import pytest
 from model_bakery import baker
 import uuid

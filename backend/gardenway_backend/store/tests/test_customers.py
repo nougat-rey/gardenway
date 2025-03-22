@@ -1,11 +1,8 @@
 from rest_framework import status
 from rest_framework.test import APIClient
-from store.models import User, Customer
+from store.models import User
 from model_bakery import baker
 import pytest
-
-# Current status:
-# ss..ss..FF. 
 
 @pytest.mark.django_db
 class TestCreateCustomer:

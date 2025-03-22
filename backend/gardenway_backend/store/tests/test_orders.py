@@ -2,10 +2,9 @@ from rest_framework import status
 from rest_framework.test import APIClient
 from store.models import User
 import pytest
-from store.models import Product, Customer, Order
+from store.models import Product
 from model_bakery import baker
 import uuid
-from uuid import uuid4
 
 def is_valid_uuid(input):
     try:

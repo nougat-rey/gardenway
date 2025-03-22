@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.test import APIClient
-from store.models import User, Product, Cart
+from store.models import User, Product
 from model_bakery import baker
 import pytest
 
