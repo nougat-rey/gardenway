@@ -1,8 +1,8 @@
 from rest_framework import status
 from rest_framework.test import APIClient
-from store.models import User
-import pytest
+from store.models import User, Cart
 from model_bakery import baker
+import pytest
 import uuid
 
 
@@ -13,48 +13,59 @@ def is_valid_uuid(input):
     except ValueError:
         return False
 
+
+@pytest.fixture
+def authenticated_client():
+    client = APIClient()
+    user = baker.make(User, is_staff=False)
+    client.force_authenticate(user)
+    return client, user
+
+
+@pytest.fixture
+def authenticated_admin_client():
+    client = APIClient()
+    user = baker.make(User, is_staff=True)
+    client.force_authenticate(user)
+    return client, user
+
+
+@pytest.fixture
+def customer(authenticated_client):
+    client, user = authenticated_client
+    response = client.get(f'/store/customers/me/', {"user_id": user.id})
+    return response.data['id']
+
+
+@pytest.fixture
+def cart(authenticated_client, customer):
+    client, user = authenticated_client
+    response = client.post('/store/carts/', {"customer": customer})
+    return response.data
+
+
 @pytest.mark.django_db
 class TestCreateCart:
 
     url = '/store/carts/'
 
-    def test_returns_201(self):
+    def test_returns_201(self, authenticated_client, customer):
+        client, _ = authenticated_client
 
-        # Arrange
-        client = APIClient()
-        user = baker.make(User, is_staff=False)
-        client.force_authenticate(user)
+        response = client.post(self.url, {"customer": customer})
 
-        # Act
-        get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id})
-        response = client.post(self.url, {"customer": get_customer_response.data['id']})
-
-        # Assert
         assert response.status_code == status.HTTP_201_CREATED
-        assert is_valid_uuid(response.data['id'])   
+        assert is_valid_uuid(response.data['id'])
 
-    def test_returns_403_from_anonymous(self):
-
-        # Arrange
+    def test_returns_403_from_anonymous(self, customer):
         client = APIClient()
-        user = baker.make(User, is_staff=False)
-        client.force_authenticate(user)
-        get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id}) 
-        customer_id = get_customer_response.data['id'] 
         client.logout()
+        response = client.post(self.url, {"customer": customer})
 
-        # Act
-        response = client.post(self.url, {"customer": customer_id})
-
-        # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_returns_400_from_invalid_data(self):
-        # Arrange
-        client = APIClient()
-        client.force_authenticate(user=User(is_staff=True))
-
-        # Act & Assert
+    def test_returns_400_from_invalid_data(self, authenticated_admin_client):
+        client, _ = authenticated_admin_client
 
         # 1. customer does not exist
         response = client.post(self.url, {"customer": 999})
@@ -65,96 +76,41 @@ class TestCreateCart:
 class TestListCarts:
     url = '/store/carts/'
 
-    def test_returns_200(self):
-
-        # Arrange
-        client = APIClient()
-        client.force_authenticate(user=User(is_staff=True))
-
-        # Act
+    def test_returns_200(self, authenticated_admin_client):
+        client, _ = authenticated_admin_client
         response = client.get(self.url)
-
-        # Assert
         assert response.status_code == status.HTTP_200_OK
 
-    def test_returns_403_from_non_admin(self):
-
-        # Arrange
-        client = APIClient()
-        client.force_authenticate(user=User(is_staff=False))
-
-        # Act
+    def test_returns_403_from_non_admin(self, authenticated_client):
+        client, _ = authenticated_client
         response = client.get(self.url)
-
-        # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 @pytest.mark.django_db
 class TestGetCart:
 
-    def test_returns_200_for_admin(self):
-
-        # Arrange
-        client = APIClient()
-        user = baker.make(User, is_staff=True)
-        client.force_authenticate(user)
-        get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id})
-        create_cart_response = client.post(f'/store/carts/', {"customer": get_customer_response.data['id']})
-        cart_id = create_cart_response.data['id']
-
-        # Act
-        response = client.get(f'/store/carts/{cart_id}/')
-
-        # Assert
+    def test_returns_200_for_admin(self, authenticated_admin_client, cart):
+        client, _ = authenticated_admin_client
+        response = client.get(f'/store/carts/{cart["id"]}/')
         assert response.status_code == status.HTTP_200_OK
 
-    def test_returns_200_for_owner(self):
-
-        # Arrange
-        client = APIClient()
-        user = baker.make(User, is_staff=False)
-        client.force_authenticate(user)
-        get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id})
-        create_cart_response = client.post(f'/store/carts/', {"customer": get_customer_response.data['id']})
-        cart_id = create_cart_response.data['id'] 
-
-        # Act
-        response = client.get(f'/store/carts/{cart_id}/')
-
-        # Assert
+    def test_returns_200_for_owner(self, authenticated_client, cart):
+        client, _ = authenticated_client
+        response = client.get(f'/store/carts/{cart["id"]}/')
         assert response.status_code == status.HTTP_200_OK
 
-    def test_returns_403_from_non_admin_and_not_owner(self):
-
-        # Arrange
-        client = APIClient()
-        user = baker.make(User, is_staff=False)
-        client.force_authenticate(user)
-        get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id})
-        create_cart_response = client.post(f'/store/carts/', {"customer": get_customer_response.data['id']})
-        cart_id = create_cart_response.data['id'] 
+    def test_returns_403_from_non_admin_and_not_owner(self, authenticated_client, cart):
+        client, _ = authenticated_client
         client.logout()
         
-        other_user = baker.make(User, is_staff=False) 
+        other_user = baker.make(User, is_staff=False)
         client.force_authenticate(other_user)
 
-        # Act
-        response = client.get(f'/store/carts/{cart_id}/')
-
-        # Assert
+        response = client.get(f'/store/carts/{cart["id"]}/')
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_returns_404(self):
-        # Arrange
-        client = APIClient()
-        client.force_authenticate(user=User(is_staff=True))
-
-        # Act
+    def test_returns_404(self, authenticated_admin_client):
+        client, _ = authenticated_admin_client
         response = client.get(f'/store/carts/500/')
-
-        # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
-
-
-
