@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.test import APIClient
-from store.models import User
+from store.models import User, Product
+from model_bakery import baker
 import pytest
 
 """
@@ -12,47 +13,45 @@ import pytest
 
 
 @pytest.mark.django_db
-class TestCreateProductImage:
+class TestCreateProductReview:
 
     def test_returns_201(self):
-
-        # Arrange
-        client = APIClient()
-        user = baker.make(User, is_staff=True)
-        client.force_authenticate(user)
-        product = baker.make(Product)
-        image_path = 'store/static/store/banner.png'
-        with open(image_path, 'rb') as img:
-            image_data = SimpleUploadedFile(
-            name='test.png', 
-            content=img.read(), 
-            content_type='image/png'
-            )
-
-        # Act
-        response = client.post(f'/store/products/{product.id}/images/', {'image': image_data}, format='multipart')
-
-        # Assert
-        assert response.status_code == status.HTTP_201_CREATED
-
-    def test_returns_403_from_non_admin(self):
 
         # Arrange
         client = APIClient()
         user = baker.make(User, is_staff=False)
         client.force_authenticate(user)
         product = baker.make(Product)
-        image_path = 'store/static/store/banner.png'
-        with open(image_path, 'rb') as img:
-            image_data = SimpleUploadedFile(
-            name='test.png', 
-            content=img.read(), 
-            content_type='image/png'
-            )
+        data = {
+            "product": product.id,
+            "rating": 5,
+            "name": "Great Product",
+            "description": "I really loved this product. It exceeded my expectations!",
+            "date": "2022-05-30"
+        }
 
         # Act
-        response = client.post(f'/store/products/{product.id}/images/', {'image': image_data}, format='multipart')
+        response = client.post(f'/store/products/{product.id}/reviews/', data)
 
+        # Assert
+        assert response.status_code == status.HTTP_201_CREATED
+
+    def test_returns_403_from_anonymous(self):
+
+        # Arrange
+        client = APIClient()
+        user = baker.make(User, is_staff=False)
+        product = baker.make(Product)
+        data = {
+            "product": product.id,
+            "rating": 5,
+            "name": "Great Product",
+            "description": "I really loved this product. It exceeded my expectations!",
+            "date": "2022-05-30"
+        }
+
+        # Act
+        response = client.post(f'/store/products/{product.id}/reviews/', data)
 
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -61,57 +60,61 @@ class TestCreateProductImage:
         
         # Arrange
         client = APIClient()
-        user = baker.make(User, is_staff=True)
+        user = baker.make(User, is_staff=False)
         client.force_authenticate(user)
         product = baker.make(Product)
+        data = {
+            "rating": 5,
+            "name": "Great Product",
+            "description": "I really loved this product. It exceeded my expectations!",
+            "date": "2022-05-30"
+        }
 
         # Act
-        response = client.post(f'/store/products/{product.id}/images/', {'image': "Hello World!"}, format='multipart')
+        response = client.post(f'/store/products/{product.id}/reviews/', data)
 
         # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.django_db
-class TestListProductImages:
-    url = '/store/products/'
+class TestListProductReviews:
 
     def test_returns_200(self):
 
         # Arrange
         client = APIClient()
-        client.force_authenticate(user=User(is_staff=True))
+        client.force_authenticate(user=User(is_staff=False))
         product = baker.make(Product)
 
         # Act
-        response = client.get(f'/store/products/{product.id}/images/')
+        response = client.get(f'/store/products/{product.id}/reviews/')
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
 
 @pytest.mark.django_db
-class TestGetProductImages:
+class TestGetProductReview:
 
     def test_returns_200(self):
 
         # Arrange
         client = APIClient()
-        user = baker.make(User, is_staff=True)
+        user = baker.make(User, is_staff=False)
         client.force_authenticate(user)
         product = baker.make(Product)
-        image_path = 'store/static/store/banner.png'
-        with open(image_path, 'rb') as img:
-            image_data = SimpleUploadedFile(
-            name='test.png', 
-            content=img.read(), 
-            content_type='image/png'
-            )
-        post_image_response = client.post(f'/store/products/{product.id}/images/', {'image': image_data}, format='multipart')
-        image_id = post_image_response.data['id']
+        data = {
+            "product": product.id,
+            "rating": 5,
+            "name": "Great Product",
+            "description": "I really loved this product. It exceeded my expectations!",
+            "date": "2022-05-30"
+        }
+        client.post(f'/store/products/{product.id}/reviews/', data)
 
         # Act
-        response = client.get(f'/store/products/{product.id}/images/{image_id}/')
+        response = client.get(f'/store/products/{product.id}/reviews/{1}/')
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
@@ -119,22 +122,20 @@ class TestGetProductImages:
     def test_returns_404(self):
         # Arrange
         client = APIClient()
-        user = baker.make(User, is_staff=True)
+        user = baker.make(User, is_staff=False)
         client.force_authenticate(user)
         product = baker.make(Product)
-        image_path = 'store/static/store/banner.png'
-        with open(image_path, 'rb') as img:
-            image_data = SimpleUploadedFile(
-            name='test.png', 
-            content=img.read(), 
-            content_type='image/png'
-            )
-        post_image_response = client.post(f'/store/products/{product.id}/images/', {'image': image_data}, format='multipart')
-        image_id = post_image_response.data['id']
-        invalid_image_id = image_id+999
-        
+        data = {
+            "product": product.id,
+            "rating": 5,
+            "name": "Great Product",
+            "description": "I really loved this product. It exceeded my expectations!",
+            "date": "2022-05-30"
+        }
+        client.post(f'/store/products/{product.id}/reviews/', data)
+
         # Act
-        response = client.get(f'/store/products/{product.id}/images/{invalid_image_id}/')
+        response = client.get(f'/store/products/{product.id}/reviews/{999}/')
 
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
