@@ -16,8 +16,8 @@ pillow = "*"
 django-cors-headers = "*"
 whitenoise = "*"
 gunicorn = "*"
-dj-database-url = "*"
 django-silk = "*"
+dj-database-url = "*"
 
 [dev-packages]
 pytest = "*"
