@@ -4,14 +4,6 @@ from store.models import User, Product
 from model_bakery import baker
 import pytest
 
-"""
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return [AllowAny()]
-        return [IsAuthenticated()]
-"""
-
-
 @pytest.mark.django_db
 class TestCreateProductReview:
 
