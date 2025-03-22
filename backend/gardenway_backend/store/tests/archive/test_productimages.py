@@ -1,15 +1,10 @@
+from psutil import users
 from rest_framework import status
 from rest_framework.test import APIClient
-from store.models import User
+from store.models import User, Product
+from model_bakery import baker
+from django.core.files.uploadedfile import SimpleUploadedFile
 import pytest
-
-"""
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return [AllowAny()]
-        return [IsAuthenticated()]
-"""
-
 
 @pytest.mark.django_db
 class TestCreateProductImage:
@@ -138,5 +133,6 @@ class TestGetProductImages:
 
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
 
 
