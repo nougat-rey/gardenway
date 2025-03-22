@@ -38,7 +38,7 @@ class TestCreateCart:
 
         # Arrange
         client = APIClient()
-        user = baker.make(User, is_staff=True)
+        user = baker.make(User, is_staff=False)
         client.force_authenticate(user)
         get_customer_response = client.get(f'/store/customers/me/', {"user_id":user.id}) 
         customer_id = get_customer_response.data['id'] 
