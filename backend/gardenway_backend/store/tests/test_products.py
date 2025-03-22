@@ -1,86 +1,95 @@
+import pytest
 from rest_framework import status
 from rest_framework.test import APIClient
 from store.models import User, Product
 from model_bakery import baker
-import pytest
+
+
+@pytest.fixture
+def client():
+    return APIClient()
+
+
+@pytest.fixture
+def admin_user():
+    return baker.make(User, is_staff=True)
+
+
+@pytest.fixture
+def non_admin_user():
+    return baker.make(User, is_staff=False)
+
+
+@pytest.fixture
+def valid_product_data():
+    return {
+        "title": "test",
+        "slug": "test",
+        "description": "test",
+        "price": 10.99,
+        "inventory": 20
+    }
+
+
+@pytest.fixture
+def invalid_product_data():
+    return {
+        "title": "invalid", "price": 10.99, "inventory": 20
+    }
 
 
 @pytest.mark.django_db
 class TestCreateProduct:
-
     url = '/store/products/'
 
-    def get_valid_data(self):
-        return {
-            "title": "test",
-            "slug": "test",
-            "description": "test",
-            "price": 10.99,
-            "inventory": 20
-        }
-
-    def get_invalid_data(self, key, invalid_data):
-        return_dict = {"title": "invalid", "price": 10.99, "inventory": 20}
-        return_dict[key] = invalid_data
-        return return_dict
-
-    def test_returns_201(self):
-
+    def test_returns_201(self, client, admin_user, valid_product_data):
         # Arrange
-        client = APIClient()
-        client.force_authenticate(user=User(is_staff=True))
+        client.force_authenticate(user=admin_user)
 
         # Act
-        response = client.post(self.url, self.get_valid_data())
+        response = client.post(self.url, valid_product_data)
 
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data['id'] > 0
 
-    def test_returns_403_from_non_admin(self):
+    def test_returns_403_from_non_admin(self, client, non_admin_user, valid_product_data):
         # Arrange
-        client = APIClient()
+        client.force_authenticate(user=non_admin_user)
 
         # Act
-        response = client.post(self.url, self.get_valid_data())
+        response = client.post(self.url, valid_product_data)
 
         # Assert
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_returns_400_from_invalid_data(self):
+    @pytest.mark.parametrize("key, invalid_data", [
+        ("price", 0),
+        ("inventory", -1)
+    ])
+    def test_returns_400_from_invalid_data(self, client, admin_user, valid_product_data, key, invalid_data):
+        
         # Arrange
-        client = APIClient()
-        client.force_authenticate(user=User(is_staff=True))
+        client.force_authenticate(user=admin_user)
+        data = valid_product_data.copy()
+        data[key] = invalid_data
 
-        # Act & Assert
+        # Act
+        response = client.post(self.url, data)
 
-        # 1. invalid title
-        response = client.post(
-            self.url, self.get_invalid_data("title", 10))
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-
-        # 2. invalid price
-        response = client.post(
-            self.url, self.get_invalid_data("price", 0))
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-
-        # 3. invalid inventory
-        response = client.post(
-            self.url, self.get_invalid_data("inventory", -1))
+        # Assert
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.django_db
 class TestListProducts:
-    url = '/store/products/'
 
-    def test_returns_200(self):
-
+    def test_returns_200(self, client):
         # Arrange
-        client = APIClient()
+        # No setup needed for this test
 
         # Act
-        response = client.get(self.url)
+        response = client.get('/store/products/')
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
@@ -89,10 +98,8 @@ class TestListProducts:
 @pytest.mark.django_db
 class TestGetProduct:
 
-    def test_returns_200(self):
-
+    def test_returns_200(self, client):
         # Arrange
-        client = APIClient()
         product = baker.make(Product)
 
         # Act
@@ -101,12 +108,9 @@ class TestGetProduct:
         # Assert
         assert response.status_code == status.HTTP_200_OK
 
-    def test_returns_404(self):
-        # Arrange
-        client = APIClient()
-
+    def test_returns_404(self, client):
         # Act
-        response = client.get(f'/store/products/500/')
+        response = client.get('/store/products/500/')
 
         # Assert
         assert response.status_code == status.HTTP_404_NOT_FOUND
