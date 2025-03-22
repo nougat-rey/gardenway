@@ -69,6 +69,17 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['id', 'title', 'slug',
                   'inventory', 'price', 'price_with_tax', 'images', 'reviews']
+    
+    def validate_inventory(self, value):
+        if value < 0:
+            raise serializers.ValidationError("Inventory cannot be negative.")
+        return value
+
+    def validate_price(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Price must be greater than zero.")
+        return value
+
 
 class CollectionSerializer(serializers.ModelSerializer):
     class Meta:
