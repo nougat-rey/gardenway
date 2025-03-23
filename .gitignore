@@ -1,5 +1,7 @@
-dev.py
 .pytest_cache
-static/
+__pycache__/
 media/
-.vscode/
+static/
+general.log
+settings/dev.py
+.vscode/settings.json
