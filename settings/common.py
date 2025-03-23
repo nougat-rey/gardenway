@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # Application definition
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
