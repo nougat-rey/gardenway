@@ -1,5 +1,7 @@
 dev.py
 
+.pytest_cache
+../pytest_cache
 __pycache__/
 media/
 static/

@@ -55,7 +55,7 @@ MIDDLEWARE = [
 if DEBUG:
     MIDDLEWARE.append('silk.middleware.SilkyMiddleware')
 
-ROOT_URLCONF = 'gardenway_backend.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATES = [
     {
@@ -73,7 +73,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'gardenway_backend.wsgi.application'
+WSGI_APPLICATION = 'wsgi.application'
 
 
 # Database
