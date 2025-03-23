@@ -14,10 +14,10 @@ djoser = "*"
 djangorestframework-simplejwt = "*"
 pillow = "*"
 django-cors-headers = "*"
-whitenoise = "*"
 gunicorn = "*"
-django-silk = "*"
 dj-database-url = "*"
+django-silk = "*"
+whitenoise = "*"
 
 [dev-packages]
 pytest = "*"
