@@ -1,6 +1,5 @@
 .pytest_cache
 __pycache__/
-media/
 general.log
 settings/dev.py
 .vscode/settings.json
