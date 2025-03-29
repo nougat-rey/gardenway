@@ -2,11 +2,10 @@
 
 ## Intro
 
-Fullstack app that services a website for an online garden center.
+Backend for an online garden center.
+[Live Demo](https://gardenway-2d10f268a969.herokuapp.com/)
 
 Backend is built using Django and provides MySQL storage, CRUD using the Django REST framework and authentication using JWT.
-
-Frontend will be built using ReactJS.
 
 ## Getting Started
 
@@ -24,7 +23,7 @@ Frontend will be built using ReactJS.
 
 1. create dev.py:
 
-`touch <project root>/backend/gardenway_backend/gardenway_backend/dev.py`
+`touch <project root>/settings/dev.py`
 
 2. Set own DEV_SECRET_KEY & DB_PASSWORD in dev.py
 
@@ -41,7 +40,7 @@ DB_PASSWORD = <mysql password>
 
 1. Log into MySQL:
 
-`mysql -u root -p <mysql password>`
+`mysql -u root -p`
 
 2. Create and use database 'store':
 
@@ -50,33 +49,33 @@ mysql> create database store;
 use store;
 ```
 
-3. Create superuser:
+3. Migrate django objects into database:
 
 ```
-cd <project root>/backend/gardenway_backend/
-python manage.py createsuperuser
-```
-
-- Follow the instructions to create superuser
-
-4. Migrate django objects into database:
-
-```
-cd <project root>/backend/gardenway_backend/
+cd <project root>
 python manage.py makemigrations store
 python manage.py makemigrations
 python manage.py migrate
 ```
 
+4. Create superuser:
+
+```
+cd <project root>
+python manage.py createsuperuser
+```
+
+- Follow the instructions to create superuser
+
 5. Populate 'store':
 
 ```
-cd <project root>/backend/gardenway_backend/seeds
+cd <project root>/seeds
 mysql -u root -p <password>
 mysql> source seed.sql
 ```
 
-### Start up backend
+### Start up backend (dev)
 
 1. Run server:
 
