@@ -27,6 +27,7 @@ urlpatterns = [
     path('__debug__/', include(debug_toolbar.urls)),
     path('store/', include('store.urls')),
     path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
     path('', TemplateView.as_view(template_name='store/index.html'))
 ]
 

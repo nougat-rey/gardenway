@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'silk',
     'djoser',
+    'rest_framework_simplejwt',
     'django_filters',
     'corsheaders'
 ]
@@ -90,6 +91,9 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
     'COERCE_DECIMAL_TO_STRING': False,
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',

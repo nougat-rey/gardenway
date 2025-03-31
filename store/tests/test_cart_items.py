@@ -36,7 +36,7 @@ class TestCreateCartItem:
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
 
-    def test_returns_403_from_anonymous(self, create_cart_and_product):
+    def test_returns_401_from_anonymous(self, create_cart_and_product):
         # Arrange
         user = baker.make(User, is_staff=False)
         cart_id, product, client = create_cart_and_product(user)
@@ -50,7 +50,7 @@ class TestCreateCartItem:
         response = client.post(f'/store/carts/{cart_id}/items/', data)
 
         # Assert
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_returns_400_from_invalid_data(self, create_cart_and_product):
         # Arrange

@@ -57,12 +57,12 @@ class TestCreateCart:
         assert response.status_code == status.HTTP_201_CREATED
         assert is_valid_uuid(response.data['id'])
 
-    def test_returns_403_from_anonymous(self, customer):
+    def test_returns_401_from_anonymous(self, customer):
         client = APIClient()
         client.logout()
         response = client.post(self.url, {"customer": customer})
 
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_returns_400_from_invalid_data(self, authenticated_admin_client):
         client, _ = authenticated_admin_client

@@ -49,12 +49,12 @@ class TestCreateProductReview:
         # Assert
         assert response.status_code == status.HTTP_201_CREATED
 
-    def test_returns_403_from_anonymous(self, client, product, review_data):
+    def test_returns_401_from_anonymous(self, client, product, review_data):
         # Act
         response = client.post(f'/store/products/{product.id}/reviews/', review_data)
 
         # Assert
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_returns_400_from_invalid_data(self, client, user, product):
         # Arrange

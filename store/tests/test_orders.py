@@ -53,16 +53,16 @@ class TestCreateOrder:
         assert post_cart_item_response.data['product_id'] == response.data['items'][0]['product']['id']
         assert post_cart_item_response.data['quantity'] == response.data['items'][0]['quantity']
 
-    def test_returns_403_from_anonymous(self, setup_data):
+    def test_returns_401_from_anonymous(self, setup_data):
         client = setup_data["client"]
         cart_id = setup_data["cart_id"]
 
         client.logout()
         response = client.post(self.url, {"cart_id": str(cart_id)}, format='json')
 
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_returns_403_from_cart_not_belong_to_user(self, setup_data):
+    def test_returns_401_from_cart_not_belong_to_user(self, setup_data):
         client = setup_data["client"]
         cart_id = setup_data["cart_id"]
 
@@ -71,7 +71,7 @@ class TestCreateOrder:
         client.force_login(other_user)
         response = client.post(self.url, {"cart_id": str(cart_id)}, format='json')
 
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_returns_403_from_invalid_data(self, setup_data):
         client = setup_data["client"]
