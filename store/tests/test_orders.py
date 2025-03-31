@@ -14,7 +14,6 @@ def is_valid_uuid(input):
         return False
 
 
-@pytest.mark.django_db
 @pytest.fixture
 def setup_data():
     user = baker.make(User, is_staff=False)
