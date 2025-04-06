@@ -121,12 +121,23 @@ class OrderViewSet(ModelViewSet):
 
     def get_permissions(self):
         if self.action == 'list' or self.action == 'destroy':
-            return [IsAdminUser()]
+            return [IsAuthenticated()]
         elif self.action == 'create':
             return [IsAuthenticated()]
         elif self.action == 'retrieve':
             return [IsAdminOrOwner()]
         return [IsAdminUser()]
+    
+    def get_queryset(self):
+        user = self.request.user
+
+        if self.action == 'list' and not user.is_staff:
+            # Non-admins should only see their own orders in list view
+            return Order.objects.filter(customer__user=user).prefetch_related('items__product')
+
+        # For retrieve, admins and non-admins need access to the object so permission can be applied
+        return Order.objects.prefetch_related('items__product')
+
 
     def get_serializer_class(self):
         if self.request.method == 'POST':

@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.test import APIClient
-from store.models import User, Product, Cart, Order
+from store.models import User, Product, Order, Customer
 import pytest
 from model_bakery import baker
 import uuid
@@ -90,21 +90,65 @@ class TestCreateOrder:
 class TestListOrders:
     url = '/store/orders/'
 
-    def test_returns_200(self):
+    def test_returns_200_and_all_orders_for_admin(self):
+        admin_user = baker.make(User, is_staff=True)
+
+        user1 = baker.make(User)
+        user2 = baker.make(User)
+
+        customer1 = Customer.objects.get(user=user1)
+        customer2 = Customer.objects.get(user=user2)
+
+        baker.make('store.Order', customer=customer1, _quantity=2)
+        baker.make('store.Order', customer=customer2, _quantity=3)
+
         client = APIClient()
-        client.force_authenticate(user=User(is_staff=True))
+        client.force_authenticate(user=admin_user)
 
         response = client.get(self.url)
 
         assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) == 5
 
-    def test_returns_403_from_non_admin(self):
+    def test_returns_200_and_only_own_orders_for_non_admin(self):
+        user = baker.make(User, is_staff=False)
+        customer = Customer.objects.get(user=user)
+
+        baker.make('store.Order', customer=customer, _quantity=2)
+
+        other_user = baker.make(User)
+        other_customer = Customer.objects.get(user=other_user)
+        baker.make('store.Order', customer=other_customer, _quantity=3)
+
         client = APIClient()
-        client.force_authenticate(user=User(is_staff=False))
+        client.force_authenticate(user=user)
 
         response = client.get(self.url)
 
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) == 2
+        for order in response.data:
+            assert order['customer'] == customer.id
+
+    def test_does_not_return_other_users_orders_for_non_admin(self):
+        user = baker.make(User, is_staff=False)
+        customer = Customer.objects.get(user=user)
+
+        other_user = baker.make(User)
+        other_customer = Customer.objects.get(user=other_user)
+        baker.make('store.Order', customer=other_customer, _quantity=3)
+
+        user_orders = baker.make('store.Order', customer=customer, _quantity=1)
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+        response = client.get(self.url)
+
+        assert response.status_code == status.HTTP_200_OK
+        returned_ids = {order['id'] for order in response.data}
+        expected_ids = {str(order.id) for order in user_orders}
+
+        assert returned_ids == expected_ids
 
 
 @pytest.mark.django_db
