@@ -220,7 +220,7 @@ insert into store_productimage (product_id, image) values (4, 'store/images/west
 insert into store_productimage (product_id, image) values (5, 'store/images/yosemite_wildflower.jpg');
 insert into store_productimage (product_id, image) values (6, 'store/images/japanese_maple.jpg');
 insert into store_productimage (product_id, image) values (7, 'store/images/sakura.jpg');
-insert into store_productimage (product_id, image) values (8, 'store/images/japanese_cedar.webp');
+insert into store_productimage (product_id, image) values (8, 'store/images/japanese_cedar.png');
 insert into store_productimage (product_id, image) values (9, 'store/images/ginkgo.jpg');
 insert into store_productimage (product_id, image) values (10, 'store/images/japanese_iris.jpg');
 insert into store_productimage (product_id, image) values (11, 'store/images/arctic_moss.webp');
@@ -228,7 +228,7 @@ insert into store_productimage (product_id, image) values (12, 'store/images/ice
 insert into store_productimage (product_id, image) values (13, 'store/images/birch_tree.jpg');
 insert into store_productimage (product_id, image) values (14, 'store/images/icelandic_cotton_grass.png');
 insert into store_productimage (product_id, image) values (15, 'store/images/lichen.jpg');
-insert into store_productimage (product_id, image) values (16, 'store/images/madeira_laurel.webp');
+insert into store_productimage (product_id, image) values (16, 'store/images/madeira_laurel.png');
 insert into store_productimage (product_id, image) values (17, 'store/images/Tassel_Hyacinth.jpeg');
 insert into store_productimage (product_id, image) values (18, 'store/images/Madeiran_Sage.jpg');
 insert into store_productimage (product_id, image) values (19, 'store/images/madeira_dragon_tree.jpg');
@@ -237,4 +237,4 @@ insert into store_productimage (product_id, image) values (21, 'store/images/vie
 insert into store_productimage (product_id, image) values (22, 'store/images/Vietnamese_Ginseng.jpeg');
 insert into store_productimage (product_id, image) values (23, 'store/images/vietnamese_cinnamon.jpg');
 insert into store_productimage (product_id, image) values (24, 'store/images/mangrove.jpg');
-insert into store_productimage (product_id, image) values (25, 'store/images/vietnamese_banana.webp');
+insert into store_productimage (product_id, image) values (25, 'store/images/vietnamese_banana.jpg');
