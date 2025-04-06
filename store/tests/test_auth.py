@@ -66,3 +66,24 @@ def test_jwt_invalid_token(api_client):
 
     assert response.status_code == 401  # Invalid token should return 401 Unauthorized
     assert response.data["code"] == "token_not_valid"
+
+import pytest
+from django.urls import reverse
+
+@pytest.mark.django_db
+def test_user_registration(api_client):
+    """Test registering a new user via the /auth/users/ endpoint."""
+
+    url = reverse("user-list")  # /auth/users/
+    user_data = {
+        "username": "bob_vance",
+        "password": "strongpass123!",
+        "email": "bob_vance@example.com",
+        "first_name": "Bob",
+        "last_name": "Vance"
+    }
+
+    response = api_client.post(url, user_data, format="json")
+
+    assert response.status_code == 201
+    assert response.data["username"] == "bob_vance"
