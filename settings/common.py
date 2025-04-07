@@ -87,7 +87,8 @@ INTERNAL_IPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React frontend is running here
+    "http://localhost:3000",
+    "https://gardenway.netlify.app",
 ]
 
 REST_FRAMEWORK = {
