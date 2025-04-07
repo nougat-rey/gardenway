@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'djoser',
     'rest_framework_simplejwt',
     'django_filters',
-    'corsheaders'
+    'corsheaders',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 MIDDLEWARE = [

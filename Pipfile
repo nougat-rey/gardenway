@@ -20,6 +20,7 @@ whitenoise = "*"
 djangorestframework-simplejwt = "*"
 cloudinary = "*"
 django-cloudinary-storage = "*"
+environ = "*"
 
 [dev-packages]
 pytest = "*"
