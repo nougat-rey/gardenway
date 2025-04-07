@@ -21,6 +21,8 @@ djangorestframework-simplejwt = "*"
 cloudinary = "*"
 django-cloudinary-storage = "*"
 environ = "*"
+python-dotenv = "*"
+django-environ = "*"
 
 [dev-packages]
 pytest = "*"

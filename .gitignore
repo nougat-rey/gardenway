@@ -5,3 +5,4 @@ settings/dev.py
 .vscode/settings.json
 static/
 .env
+upload_images.py
