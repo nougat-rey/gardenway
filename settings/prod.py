@@ -29,8 +29,5 @@ CLOUDINARY_STORAGE = {
     'CACHEABLE': True,  # To enable caching for faster delivery of media URLs
 }
 
-# Set MEDIA_URL to directly reference Cloudinary
-MEDIA_URL = 'https://res.cloudinary.com/{}/'.format(os.getenv('CLOUDINARY_CLOUD_NAME'))
-
 # Use Cloudinary for media storage
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
