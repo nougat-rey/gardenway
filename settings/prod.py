@@ -8,7 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 # Production settings
 DEBUG = False
-ALLOWED_HOSTS = ['https://gardenway-11a7983dd747.herokuapp.com']
+ALLOWED_HOSTS = ['gardenway-11a7983dd747.herokuapp.com']
 
 # Fetch the SECRET_KEY from environment variables
 SECRET_KEY = os.getenv('SECRET_KEY')
