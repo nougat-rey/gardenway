@@ -8,11 +8,13 @@ import environ
 
 # Load environment variables from .env
 env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+env = environ.Env()
+env_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
+environ.Env.read_env(env_file_path)
 
 # Production settings
 DEBUG = False
-ALLOWED_HOSTS = ['gardenway-4e86e7894057.herokuapp.com']
+ALLOWED_HOSTS = ['https://gardenway-11a7983dd747.herokuapp.com']
 
 SECRET_KEY = env('SECRET_KEY')
 
@@ -31,3 +33,4 @@ CLOUDINARY_STORAGE = {
 
 # Use Cloudinary for media storage
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
