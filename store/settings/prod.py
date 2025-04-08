@@ -31,3 +31,4 @@ CLOUDINARY_STORAGE = {
 
 # Use Cloudinary for media storage
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
