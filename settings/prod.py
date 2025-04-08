@@ -14,7 +14,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 DEBUG = False
 ALLOWED_HOSTS = ['gardenway-4e86e7894057.herokuapp.com']
 
-SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = env('SECRET_KEY')
 
 # Database settings for production
 DATABASES = {
