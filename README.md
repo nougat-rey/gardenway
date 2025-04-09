@@ -1,90 +1,178 @@
 ![Gardenway](images/banner.png)
 
-## Intro
+# Gardenway - Backend
 
-Backend for an online garden center.
-[Live Demo](https://gardenway-2d10f268a969.herokuapp.com/)
+Welcome to the **backend** of Gardenway — an online garden store built with Django REST Framework and MySQL, deployed to Heroku, and integrated with Cloudinary for media storage.
 
-Backend is built using Django and provides MySQL storage, CRUD using the Django REST framework and authentication using JWT.
+[Live Backend](https://gardenway-11a7983dd747.herokuapp.com/)  
+[Live Frontend](https://gardenway.netlify.app/) | [Frontend GitHub Repo](https://github.com/nougat-rey/gardenway_frontend)
 
-## Getting Started
+---
 
-### Load project environment
+## Project Purpose
 
-1. Install project dependencies:
+This project builds a robust, production-ready e-commerce backend using modern tools and best practices.
 
-`pipenv install`
+---
 
-2. Start project virtual environment:
+## Features
 
-`pipenv shell`
+✅ JWT Authentication  
+✅ Cloudinary integration for product image uploads  
+✅ MySQL for relational data modeling  
+✅ Robust test coverage using `pytest`  
+✅ Admin dashboard for product + order management  
+✅ RESTful API with pagination, filtering, and custom serializers  
+✅ Deployed backend on Heroku  
+✅ Connected to live frontend at [gardenway.netlify.app](https://gardenway.netlify.app)
 
-### Set up config file:
+---
 
-1. create dev.py:
+## 🛠️ Getting Started
 
-`touch <project root>/settings/dev.py`
+### 1. Clone and install dependencies
 
-2. Set own DEV_SECRET_KEY & DB_PASSWORD in dev.py
-
-```
-DEV_SECRET_KEY = <secret key>
-DB_PASSWORD = <mysql password>
-```
-
-- The following can be used to generate a secret key, which can be hard-coded into the config file:
-
-`django.core.management.utils.get_random_secret_key()`
-
-### Set up database
-
-1. Log into MySQL:
-
-`mysql -u root -p`
-
-2. Create and use database 'store':
-
-```
-mysql> create database store;
-use store;
+```bash
+git clone https://github.com/nougat-rey/gardenway.git
+cd gardenway
+pipenv install
+pipenv shell
 ```
 
-3. Migrate django objects into database:
+### 2. Configure environment
 
+Create a new config file:
+
+```bash
+touch gardenway/settings/dev.py
 ```
-cd <project root>
+
+Inside `dev.py`, add:
+
+```python
+DEV_SECRET_KEY = '<your-secret-key>'
+DB_PASSWORD = '<your-mysql-password>'
+```
+
+You can generate a Django secret key with:
+
+```bash
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+### 3. Set up the database
+
+```bash
+mysql -u root -p
+```
+
+Then inside MySQL shell:
+
+```sql
+CREATE DATABASE store;
+USE store;
+```
+
+In your project root:
+
+```bash
 python manage.py makemigrations store
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-4. Create superuser:
+Create a superuser:
 
-```
-cd <project root>
+```bash
 python manage.py createsuperuser
 ```
 
-- Follow the instructions to create superuser
+Seed the database (optional):
 
-5. Populate 'store':
-
-```
-cd <project root>/seeds
-mysql -u root -p <password>
-mysql> source seed.sql
+```bash
+cd seeds
+mysql -u root -p < seed.sql
 ```
 
-### Start up backend (dev)
+### 4. Start the development server
 
-1. Run server:
+```bash
+python manage.py runserver
+```
 
-`python manage.py runserver`
+- API available at: `http://localhost:8000/store/`
+- Admin dashboard: `http://localhost:8000/admin/`
 
-2. Go to http://localhost:8000/store to access API
+---
 
-3. Go to http://localhost:8000/admin to access admin site (login using superuser credentials)
+## Running Tests
 
-## Help
+```bash
+pytest store/tests/
+```
 
-If you have any questions or need help setting it up, feel free to email me at geoffrey.nguyen9@gmail.com and I'll try to respond as soon as I can.
+This project uses `pytest` for testing views, models, and authentication.
+
+---
+
+## Deployment
+
+Gardenway is deployed to Heroku. To deploy your own version:
+
+1. Set environment variables (Heroku CLI or dashboard):
+
+   - `SECRET_KEY`
+   - `DB_PASSWORD`
+   - `CLOUDINARY_CLOUD_NAME`
+   - `CLOUDINARY_API_KEY`
+   - `CLOUDINARY_API_SECRET`
+
+2. Run migrations and collect static files:
+
+```bash
+python manage.py migrate
+python manage.py collectstatic
+```
+
+---
+
+## Media Hosting with Cloudinary
+
+Product images are uploaded and served via Cloudinary.
+
+You’ll need to configure the following in your environment:
+
+```env
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+```
+
+---
+
+## Contact
+
+Have questions or feedback?  
+Email me at: **geoffrey.nguyen9@gmail.com**
+
+---
+
+## 📁 Repo Overview
+
+```bash
+gardenway/
+├── store/               # Core Django app (products, categories, orders, etc.)
+├── seeds/               # SQL seed files for development
+├── settings/            # Environment-based settings (dev, prod)
+├── tests/               # Pytest tests
+```
+
+---
+
+## 🙌 Acknowledgements
+
+- [Django REST Framework](https://www.django-rest-framework.org/)
+- [Cloudinary](https://cloudinary.com/)
+- [Pytest](https://docs.pytest.org/)
+- [Heroku](https://www.heroku.com/)
+- [Netlify](https://www.netlify.com/)
