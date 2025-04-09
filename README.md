@@ -28,7 +28,7 @@ This project builds a robust, production-ready e-commerce backend using modern t
 
 ---
 
-## 🛠️ Getting Started
+## Getting Started
 
 ### 1. Clone and install dependencies
 
@@ -157,7 +157,7 @@ Email me at: **geoffrey.nguyen9@gmail.com**
 
 ---
 
-## 📁 Repo Overview
+## Repo Overview
 
 ```bash
 gardenway/
@@ -169,7 +169,7 @@ gardenway/
 
 ---
 
-## 🙌 Acknowledgements
+## Acknowledgements
 
 - [Django REST Framework](https://www.django-rest-framework.org/)
 - [Cloudinary](https://cloudinary.com/)
