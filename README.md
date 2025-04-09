@@ -1,4 +1,6 @@
-![Gardenway](images/banner.png)
+<p align="center">
+  <img src="banner.png" alt="Gardenway Banner" width="400" />
+</p>
 
 # Gardenway - Backend
 
